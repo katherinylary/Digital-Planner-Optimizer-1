@@ -15,6 +15,7 @@ import Diary from "@/pages/diary";
 import Books from "@/pages/books";
 import ImportantDates from "@/pages/important-dates";
 import Courses from "@/pages/courses";
+import Finance from "@/pages/finance";
 import Settings from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 
@@ -36,6 +37,7 @@ function Router() {
         <Route path="/books" component={Books} />
         <Route path="/important-dates" component={ImportantDates} />
         <Route path="/courses" component={Courses} />
+        <Route path="/finance" component={Finance} />
         <Route path="/settings" component={Settings} />
         <Route component={NotFound} />
       </Switch>

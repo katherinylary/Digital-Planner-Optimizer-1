@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { 
   Home, CalendarDays, CheckSquare, Activity, CheckCircle2, 
   Heart, GraduationCap, Briefcase, BookOpen, BookMarked, 
-  CalendarHeart, Settings, Menu, X, Sparkles
+  CalendarHeart, Settings, Menu, X, Sparkles, Wallet
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ const navigation = [
   { name: "Autocuidado", href: "/self-care", icon: Heart },
   { name: "Faculdade", href: "/university", icon: GraduationCap },
   { name: "Profissional", href: "/professional", icon: Briefcase },
+  { name: "Finanças", href: "/finance", icon: Wallet },
   { name: "Diário", href: "/diary", icon: BookOpen },
   { name: "Livros", href: "/books", icon: BookMarked },
   { name: "Datas Importantes", href: "/important-dates", icon: CalendarHeart },
