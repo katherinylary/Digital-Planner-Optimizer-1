@@ -2,10 +2,11 @@ import { Link, useLocation } from "wouter";
 import { 
   Home, CalendarDays, CheckSquare, Activity, CheckCircle2, 
   Heart, GraduationCap, Briefcase, BookOpen, BookMarked, 
-  CalendarHeart, Settings, Menu, X, Sparkles, Wallet
+  CalendarHeart, Settings, Menu, X, Sparkles, Wallet, LogOut
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 const navigation = [
   { name: "Início", href: "/", icon: Home },
@@ -27,6 +28,7 @@ const navigation = [
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const auth = useAuth();
 
   return (
     <div className="flex h-screen bg-background overflow-hidden font-sans">
@@ -81,6 +83,22 @@ export function Layout({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+
+        {auth.isSetup && (
+          <div className="px-3 py-3 border-t border-border/50">
+            <div className="flex items-center justify-between px-3 py-1.5">
+              <span className="text-xs text-muted-foreground truncate">{auth.storedUsername}</span>
+              <button
+                onClick={auth.logout}
+                className="text-muted-foreground hover:text-destructive transition-colors ml-2 shrink-0"
+                title="Sair"
+                data-testid="button-sidebar-logout"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </aside>
 
       {/* Main content */}

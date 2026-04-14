@@ -3,6 +3,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout";
+import { LoginScreen } from "@/components/login-screen";
+import { useAuth } from "@/hooks/use-auth";
 import Home from "@/pages/home";
 import Schedule from "@/pages/schedule";
 import Tasks from "@/pages/tasks";
@@ -45,12 +47,36 @@ function Router() {
   );
 }
 
+function AuthGate() {
+  const auth = useAuth();
+
+  if (auth.isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-primary text-sm animate-pulse">Carregando...</div>
+      </div>
+    );
+  }
+
+  if (!auth.isAuthenticated) {
+    return (
+      <LoginScreen
+        isSetup={auth.isSetup}
+        onLogin={auth.login}
+        onSetup={auth.setupCredentials}
+      />
+    );
+  }
+
+  return <Router />;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
+          <AuthGate />
         </WouterRouter>
         <Toaster />
       </TooltipProvider>
