@@ -9,7 +9,7 @@ export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [text, setText] = useState("");
 
-  const API = "https://SEU-BACKEND.onrender.com";
+  const API = "https://digital-planner-api.onrender.com";;
 
   async function loadTasks() {
     const res = await fetch(`${API}/tasks`);
