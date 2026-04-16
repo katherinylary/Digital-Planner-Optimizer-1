@@ -26,5 +26,6 @@ export function useMood() {
   return {
     getMoodForDate,
     setMoodForDate,
+    moodRecords,
   };
 }
