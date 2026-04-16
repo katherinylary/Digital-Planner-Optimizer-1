@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 
-const API_URL = "https://digital-planner-optimizer-1-4.onrender.com";
-
 type Task = {
   id: number;
   text: string;
@@ -9,38 +7,33 @@ type Task = {
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [input, setInput] = useState("");
+  const [text, setText] = useState("");
 
-  // 🔄 carregar tarefas do servidor
+  const API = "https://SEU-BACKEND.onrender.com";
+
   async function loadTasks() {
-    const res = await fetch(`${API_URL}/tasks`);
+    const res = await fetch(`${API}/tasks`);
     const data = await res.json();
     setTasks(data);
   }
 
-  // ➕ criar tarefa
   async function addTask() {
-    if (!input.trim()) return;
+    if (!text) return;
 
-    await fetch(`${API_URL}/tasks`, {
+    const res = await fetch(`${API}/tasks`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ text: input }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
     });
 
-    setInput("");
-    loadTasks();
+    const newTask = await res.json();
+    setTasks([...tasks, newTask]);
+    setText("");
   }
 
-  // ❌ deletar tarefa
   async function deleteTask(id: number) {
-    await fetch(`${API_URL}/tasks/${id}`, {
-      method: "DELETE",
-    });
-
-    loadTasks();
+    await fetch(`${API}/tasks/${id}`, { method: "DELETE" });
+    setTasks(tasks.filter((t) => t.id !== id));
   }
 
   useEffect(() => {
@@ -48,24 +41,44 @@ export default function App() {
   }, []);
 
   return (
-    <div style={{ padding: 20, fontFamily: "system-ui" }}>
-      <h1>Meu Planner</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+      <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl">
+        <h1 className="text-2xl font-bold mb-4 text-center">
+          Meu Planejador
+        </h1>
 
-      <input
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Nova tarefa"
-      />
-      <button onClick={addTask}>Adicionar</button>
+        <div className="flex gap-2 mb-4">
+          <input
+            className="flex-1 border p-2 rounded"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Nova tarefa..."
+          />
+          <button
+            onClick={addTask}
+            className="bg-blue-500 text-white px-4 rounded"
+          >
+            +
+          </button>
+        </div>
 
-      <ul>
-        {tasks.map((task) => (
-          <li key={task.id}>
-            {task.text}
-            <button onClick={() => deleteTask(task.id)}>X</button>
-          </li>
-        ))}
-      </ul>
+        <ul className="space-y-2">
+          {tasks.map((task) => (
+            <li
+              key={task.id}
+              className="flex justify-between items-center bg-gray-50 p-2 rounded"
+            >
+              <span>{task.text}</span>
+              <button
+                onClick={() => deleteTask(task.id)}
+                className="text-red-500"
+              >
+                x
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
