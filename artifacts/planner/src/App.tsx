@@ -9,7 +9,7 @@ export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [text, setText] = useState("");
 
-  const API = "https://digital-planner-optimizer-1-4.onrender.com";;
+  const API = "https://digital-planner-optimizer-1-4.onrender.com";
 
   async function loadTasks() {
     const res = await fetch(`${API}/tasks`);
@@ -18,7 +18,7 @@ export default function App() {
   }
 
   async function addTask() {
-    if (!text) return;
+    if (!text.trim()) return;
 
     const res = await fetch(`${API}/tasks`, {
       method: "POST",
@@ -41,43 +41,43 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
-      <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl">
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          Meu Planejador
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-pink-100 flex items-center justify-center p-6">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6">
+        <h1 className="text-2xl font-bold text-center mb-6">
+          🧠 Meu Planejador
         </h1>
 
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-6">
           <input
-            className="flex-1 border p-2 rounded"
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Nova tarefa..."
+            className="flex-1 border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
           />
           <button
             onClick={addTask}
-            className="bg-blue-500 text-white px-4 rounded"
+            className="bg-indigo-500 hover:bg-indigo-600 text-white px-4 rounded-xl"
           >
             +
           </button>
         </div>
 
-        <ul className="space-y-2">
+        <div className="space-y-2">
           {tasks.map((task) => (
-            <li
+            <div
               key={task.id}
-              className="flex justify-between items-center bg-gray-50 p-2 rounded"
+              className="flex justify-between items-center bg-gray-50 p-3 rounded-xl"
             >
               <span>{task.text}</span>
               <button
                 onClick={() => deleteTask(task.id)}
-                className="text-red-500"
+                className="text-red-500 hover:text-red-700"
               >
-                x
+                excluir
               </button>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
     </div>
   );
