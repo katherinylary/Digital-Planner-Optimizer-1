@@ -490,7 +490,7 @@ const PORT = process.env.PORT || 3000;
 initDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(API rodando na porta ${PORT});
+      console.log(`API rodando na porta ${PORT}`);
     });
   })
   .catch((error) => {
