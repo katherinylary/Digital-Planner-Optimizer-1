@@ -26,7 +26,7 @@ export function useAuth() {
   }, []);
 
   const setupCredentials = useCallback(async (username: string, password: string) => {
-    const res = await fetch(${API_URL}/register, {
+    const res = await fetch(`${API_URL}/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export function useAuth() {
       throw new Error(data.error || "Erro ao criar conta");
     }
 
-    const loginRes = await fetch(${API_URL}/login, {
+    const loginRes = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export function useAuth() {
 
   const login = useCallback(async (username: string, password: string): Promise<boolean> => {
     try {
-      const res = await fetch(${API_URL}/login, {
+      const res = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
