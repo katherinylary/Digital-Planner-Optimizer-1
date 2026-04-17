@@ -120,6 +120,8 @@ app.delete("/tasks/:id", auth, async (req: any, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+"jsonwebtoken": "^9.0.2",
+"bcryptjs": "^2.4.3"
 
 app.listen(PORT, () => {
   console.log("API com login 🚀");
