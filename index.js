@@ -481,7 +481,7 @@ app.patch("/events/:id", auth, async (req, res) => {
     const event = current.rows[0];
 
     if (!event) {
-      return res.status(404).json({ error: "Evento não encontrado" });
+      return res.status(404).json({ error: "Evento não encontrado ou você não pode editar este evento" });
     }
 
     const nextTitle = req.body.title ?? event.title;
@@ -490,6 +490,9 @@ app.patch("/events/:id", auth, async (req, res) => {
     const nextEndTime = req.body.endTime ?? event.end_time;
     const nextDescription = req.body.description ?? event.description;
     const nextCategory = req.body.category ?? event.category;
+    const participantEmails = Array.isArray(req.body.participantEmails)
+      ? req.body.participantEmails
+      : null;
 
     const result = await pool.query(
       `
@@ -509,7 +512,8 @@ app.patch("/events/:id", auth, async (req, res) => {
         time,
         end_time AS "endTime",
         description,
-        category
+        category,
+        user_id::text AS "ownerId"
       `,
       [
         nextTitle,
@@ -523,7 +527,49 @@ app.patch("/events/:id", auth, async (req, res) => {
       ]
     );
 
-    return res.json(result.rows[0]);
+    if (participantEmails) {
+      await pool.query(
+        DELETE FROM event_participants WHERE event_id = $1,
+        [req.params.id]
+      );
+
+      const cleanEmails = [
+        ...new Set(
+          participantEmails
+            .map((email) => String(email).trim().toLowerCase())
+            .filter(Boolean)
+        ),
+      ];
+
+      if (cleanEmails.length > 0) {
+        const usersResult = await pool.query(
+          `
+          SELECT id, email
+          FROM users
+          WHERE LOWER(email) = ANY($1)
+          `,
+          [cleanEmails]
+        );
+
+        for (const user of usersResult.rows) {
+          if (user.id !== req.userId) {
+            await pool.query(
+              `
+              INSERT INTO event_participants (event_id, user_id)
+              VALUES ($1, $2)
+              ON CONFLICT (event_id, user_id) DO NOTHING
+              `,
+              [req.params.id, user.id]
+            );
+          }
+        }
+      }
+    }
+
+    return res.json({
+      ...result.rows[0],
+      isOwner: true,
+    });
   } catch (error) {
     console.error("Erro no PATCH /events:", error);
     return res.status(500).json({ error: "Erro ao atualizar evento" });
