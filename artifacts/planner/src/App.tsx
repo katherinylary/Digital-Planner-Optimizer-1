@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 
 const API = "https://digital-planner-optimizer-1-4.onrender.com";
 
-tipo Tarefa = {
-  id: número;
-  texto: string;
+type Task = {
+  id: number;
+  text: string;
 };
 
 export default function App() {
@@ -13,106 +13,100 @@ export default function App() {
   );
 
   const [email, setEmail] = useState("");
-  const [senha, definirSenha] = useState("");
+  const [password, setPassword] = useState("");
 
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [texto, setTexto] = useState("");
+  const [text, setText] = useState("");
 
-  // ================= LOGIN =================
-
-  função assíncrona register() {
-    aguardar fetch(`${API}/register`, {
-      método: "POST",
-      cabeçalhos: {"Content-Type": "application/json"},
-      corpo: JSON.stringify({ email, senha }),
+  async function register() {
+    await fetch(`${API}/register`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ email, password }),
     });
     alert("Usuário criado!");
   }
 
-  função assíncrona login() {
+  async function login() {
     const res = await fetch(`${API}/login`, {
-      método: "POST",
-      cabeçalhos: {"Content-Type": "application/json"},
-      corpo: JSON.stringify({ email, senha }),
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
 
-    se (dados.token) {
+    if (data.token) {
       localStorage.setItem("token", data.token);
-      setToken(dados.token);
-    } outro {
-      alert("Erro de login");
+      setToken(data.token);
+    } else {
+      alert("Erro no login");
     }
   }
 
-  função logout() {
+  function logout() {
     localStorage.removeItem("token");
-    setToken(nulo);
+    setToken(null);
     setTasks([]);
   }
 
-  // ================= TAREFAS =================
-
-  função assíncrona carregarTarefas() {
+  async function loadTasks() {
     const res = await fetch(`${API}/tasks`, {
-      cabeçalhos: { Authorization: token! },
+      headers: { Authorization: token! },
     });
     const data = await res.json();
-    setTasks(dados);
+    setTasks(data);
   }
 
-  função assíncrona adicionarTarefa() {
-    se (!text.trim()) retorne;
+  async function addTask() {
+    if (!text.trim()) return;
 
     const res = await fetch(`${API}/tasks`, {
-      método: "POST",
-      cabeçalhos: {
+      method: "POST",
+      headers: {
         "Content-Type": "application/json",
-        Autorização: token!
+        Authorization: token!,
       },
-      corpo: JSON.stringify({ texto }),
+      body: JSON.stringify({ text }),
     });
 
     const newTask = await res.json();
-    setTasks((anterior) => [...anterior, novaTask]);
-    definirTexto("");
+    setTasks((prev) => [...prev, newTask]);
+    setText("");
   }
 
-  função assíncrona deleteTask(id: número) {
-    aguardar fetch(`${API}/tasks/${id}`, {
-      método: "EXCLUIR",
-      cabeçalhos: { Authorization: token! },
+  async function deleteTask(id: number) {
+    await fetch(`${API}/tasks/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: token! },
     });
 
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }
 
   useEffect(() => {
-    se (token) carregarTarefas();
+    if (token) loadTasks();
   }, [token]);
 
-  // ================= UI =================
-
-  se (!token) {
-    retornar (
+  if (!token) {
+    return (
       <div style={styles.page}>
         <div style={styles.card}>
           <h2>Login / Cadastro</h2>
 
-          <entrada
-            espaço reservado="E-mail"
-            valor={email}
+          <input
+            placeholder="Email"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
-            estilo={estilos.entrada}
+            style={styles.input}
           />
 
-          <entrada
+          <input
             placeholder="Senha"
-            tipo="senha"
-            valor={senha}
+            type="password"
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
-            estilo={estilos.entrada}
+            style={styles.input}
           />
 
           <button onClick={login} style={styles.button}>
@@ -127,7 +121,7 @@ export default function App() {
     );
   }
 
-  retornar (
+  return (
     <div style={styles.page}>
       <div style={styles.card}>
         <h1>🧠 Meu Planejador</h1>
@@ -137,11 +131,11 @@ export default function App() {
         </button>
 
         <div style={styles.row}>
-          <entrada
-            valor={texto}
+          <input
+            value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Nova tarefa..."
-            estilo={estilos.entrada}
+            style={styles.input}
           />
           <button onClick={addTask} style={styles.button}>
             +
@@ -161,67 +155,65 @@ export default function App() {
   );
 }
 
-// ================= ESTILO =================
-
 const styles: any = {
-  página: {
-    altura: "100vh",
-    exibir: "flex",
-    justifyContent: "centro",
+  page: {
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
     alignItems: "center",
-    fundo: "#f1f5f9",
+    background: "#f1f5f9",
     fontFamily: "system-ui",
   },
-  cartão: {
-    largura: 350,
-    fundo: "#fff",
-    acolchoamento: 20,
+  card: {
+    width: 350,
+    background: "#fff",
+    padding: 20,
     borderRadius: 12,
     boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
   },
-  entrada: {
-    largura: "100%",
-    acolchoamento: 10,
-    margemInferior: 10,
+  input: {
+    width: "100%",
+    padding: 10,
+    marginBottom: 10,
     borderRadius: 8,
-    borda: "1px sólida #ddd",
+    border: "1px solid #ddd",
   },
-  botão: {
-    largura: "100%",
-    acolchoamento: 10,
-    fundo: "#4f46e5",
-    cor: "#fff",
-    fronteira: "nenhuma",
+  button: {
+    width: "100%",
+    padding: 10,
+    background: "#4f46e5",
+    color: "#fff",
+    border: "none",
     borderRadius: 8,
-    margemInferior: 10,
-    cursor: "ponteiro",
+    marginBottom: 10,
+    cursor: "pointer",
   },
-  botãoSecundário: {
-    largura: "100%",
-    acolchoamento: 10,
-    fundo: "#e5e7eb",
-    fronteira: "nenhuma",
+  buttonSecondary: {
+    width: "100%",
+    padding: 10,
+    background: "#e5e7eb",
+    border: "none",
     borderRadius: 8,
-    cursor: "ponteiro",
+    cursor: "pointer",
   },
-  Sair: {
-    fundo: "transparente",
-    fronteira: "nenhuma",
-    cor: "vermelho",
-    flutuar: "direita",
-    cursor: "ponteiro",
+  logout: {
+    background: "transparent",
+    border: "none",
+    color: "red",
+    float: "right",
+    cursor: "pointer",
   },
-  linha: {
-    exibir: "flex",
-    intervalo: 10,
-    margemInferior: 15,
+  row: {
+    display: "flex",
+    gap: 10,
+    marginBottom: 15,
   },
-  tarefa: {
-    exibir: "flex",
-    justifyContent: "espaço-entre",
-    acolchoamento: 10,
-    fundo: "#f8fafc",
+  task: {
+    display: "flex",
+    justifyContent: "space-between",
+    padding: 10,
+    background: "#f8fafc",
     borderRadius: 8,
-    margemInferior: 8,
+    marginBottom: 8,
   },
 };
