@@ -168,6 +168,13 @@ const handleAdd = () => {
     setForm({ ...form, participants: e.target.value })
   }
 />
+                <Input
+  placeholder="Emails dos convidados (separados por vírgula)"
+  value={form.participants}
+  onChange={(e) =>
+    setForm({ ...form, participants: e.target.value })
+  }
+/>
                 <Button onClick={handleAdd} className="w-full" data-testid="button-save-event">Salvar</Button>
               </div>
             </DialogContent>
