@@ -201,7 +201,28 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {todayGoals.map((goal) => (
+               {todayGoals.map((goal) => (
+  <div
+    key={goal.id}
+    className="flex items-center gap-3 bg-background/50 p-3 rounded-lg border border-border/50"
+  >
+    <Checkbox
+      id={`goal-${goal.id}`}
+      checked={goal.completed}
+      onCheckedChange={() => toggleGoal(goal.id)}
+      className="rounded-full data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+    />
+    <label
+      htmlFor={`goal-${goal.id}`}
+      className={cn(
+        "flex-1 cursor-pointer transition-all",
+        goal.completed && "text-muted-foreground line-through"
+      )}
+    >
+      {goal.title}
+    </label>
+  </div>
+))}
                   <div
                     key={goal.id}
                     className="flex items-center gap-3 bg-background/50 p-3 rounded-lg border border-border/50"
