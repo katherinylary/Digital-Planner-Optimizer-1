@@ -53,12 +53,36 @@ export default function Schedule() {
   const [postponingEvent, setPostponingEvent] = useState<Event | null>(null);
   const [postponeCustomDate, setPostponeCustomDate] = useState("");
 
-  const handleAdd = () => {
-    if (!form.title.trim()) return;
-    addEvent({ title: form.title, date: form.date, time: form.time, endTime: form.endTime, description: form.description, category: form.category });
-    setForm({ title: "", date: format(new Date(), "yyyy-MM-dd"), time: "09:00", endTime: "10:00", description: "", category: "Pessoal" });
-    setAddOpen(false);
-  };
+const handleAdd = () => {
+  if (!form.title.trim()) return;
+
+  const emails = form.participants
+    .split(",")
+    .map((e) => e.trim())
+    .filter(Boolean);
+
+  addEvent({
+    title: form.title,
+    date: form.date,
+    time: form.time,
+    endTime: form.endTime,
+    description: form.description,
+    category: form.category,
+    participantEmails: emails
+  });
+
+  setForm({
+    title: "",
+    date: format(new Date(), "yyyy-MM-dd"),
+    time: "09:00",
+    endTime: "10:00",
+    description: "",
+    category: "Pessoal",
+    participants: ""
+  });
+
+  setAddOpen(false);
+};
 
   const openEdit = (ev: Event) => {
     setEditingEvent(ev);
