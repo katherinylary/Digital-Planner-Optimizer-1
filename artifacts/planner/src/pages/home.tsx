@@ -88,7 +88,7 @@ function WaterDroplet({ index, liters, onSet }: { index: number; liters: number;
   };
 
   return (
-    <div className="flex flex-col items-center gap-1" title={`${index - 0.5}L / ${index}L`}>
+    <div className="flex flex-col items-center gap-1" title={${index - 0.5}L / ${index}L}>
       <div className="relative w-10 h-14 cursor-pointer select-none">
         <div className="absolute inset-0 overflow-hidden rounded-b-full rounded-t-[60%]">
           <div className={cn("absolute inset-0 transition-colors duration-200", isFull ? "bg-blue-400" : isHalf ? "bg-blue-300" : "bg-muted/50")} />
@@ -100,12 +100,12 @@ function WaterDroplet({ index, liters, onSet }: { index: number; liters: number;
           <button
             onClick={handleFullClick}
             className="flex-1 w-full rounded-t-[60%]"
-            title={isFull ? `Reduzir para ${halfVal}L` : `Completar ${index}L`}
+            title={isFull ? Reduzir para ${halfVal}L : Completar ${index}L}
           />
           <button
             onClick={handleHalfClick}
             className="flex-1 w-full rounded-b-full"
-            title={isHalf ? `Remover ${halfVal}L` : `Adicionar ${halfVal}L`}
+            title={isHalf ? Remover ${halfVal}L : Adicionar ${halfVal}L}
           />
         </div>
         {(isFull || isHalf) && (
@@ -130,8 +130,8 @@ export default function Home() {
   const { getGoalsForDate, addGoal, toggleGoal } = useGoals();
   const { events } = useEvents();
 
-  const todayTasks = tasks.filter(t => t.date === today || !t.completed);
-  const pendingTasks = todayTasks.filter(t => !t.completed);
+  const todayTasks = tasks.filter((t) => t.date === today || !t.completed);
+  const pendingTasks = todayTasks.filter((t) => !t.completed);
 
   const liters = getLitersForDate(today);
   const currentMood = getMoodForDate(today);
@@ -150,7 +150,10 @@ export default function Home() {
 
   const upcomingEvents = events
     .filter((ev) => ev.date >= today && ev.date <= format(addDays(new Date(), 7), "yyyy-MM-dd"))
-    .sort((a, b) => { const d = a.date.localeCompare(b.date); return d !== 0 ? d : a.time.localeCompare(b.time); })
+    .sort((a, b) => {
+      const d = a.date.localeCompare(b.date);
+      return d !== 0 ? d : a.time.localeCompare(b.time);
+    })
     .slice(0, 5);
 
   const getDateLabel = (dateStr: string) => {
@@ -159,37 +162,37 @@ export default function Home() {
       if (isToday(d)) return "Hoje";
       if (isTomorrow(d)) return "Amanhã";
       return format(d, "EEE, d MMM", { locale: ptBR });
-    } catch { return dateStr; }
+    } catch {
+      return dateStr;
+    }
   };
 
   return (
     <div className="space-y-6 pb-20">
-      {/* Header */}
       <div>
         <h1 className="text-3xl md:text-4xl font-serif italic text-primary flex items-center gap-2">
-  {theme === "masculino" ? "Olá!" : "Olá, linda!"}
-  <Sparkles className="h-6 w-6 text-yellow-400" />
-</h1>
+          {theme === "masculino" ? "Olá!" : "Olá, linda!"}
+          <Sparkles className="h-6 w-6 text-yellow-400" />
         </h1>
         <p className="text-muted-foreground capitalize mt-1">{displayDate}</p>
       </div>
 
-      {/* Daily Quote */}
       <Card className="bg-gradient-to-r from-primary/10 via-purple-50/50 to-pink-50/50 dark:from-primary/10 dark:via-purple-900/10 dark:to-pink-900/10 border-primary/20">
         <CardContent className="py-4 px-5 flex items-start gap-3">
           <Quote className="h-5 w-5 text-primary/60 shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm italic font-medium text-foreground leading-relaxed">"{dailyQuote.text}"</p>
-            {dailyQuote.author && <p className="text-xs text-muted-foreground mt-1">— {dailyQuote.author}</p>}
+            <p className="text-sm italic font-medium text-foreground leading-relaxed">
+              "{dailyQuote.text}"
+            </p>
+            {dailyQuote.author && (
+              <p className="text-xs text-muted-foreground mt-1">— {dailyQuote.author}</p>
+            )}
           </div>
         </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* Left Column */}
         <div className="md:col-span-8 space-y-6">
-
-          {/* Goals */}
           <Card className="bg-gradient-to-br from-primary/5 to-secondary/30 border-primary/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-serif italic flex items-center gap-2 text-primary">
@@ -198,15 +201,24 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {todayGoals.map(goal => (
-                  <div key={goal.id} className="flex items-center gap-3 bg-background/50 p-3 rounded-lg border border-border/50">
+                {todayGoals.map((goal) => (
+                  <div
+                    key={goal.id}
+                    className="flex items-center gap-3 bg-background/50 p-3 rounded-lg border border-border/50"
+                  >
                     <Checkbox
-                      id={`goal-${goal.id}`}
+                      id={goal-${goal.id}}
                       checked={goal.completed}
                       onCheckedChange={() => toggleGoal(goal.id)}
                       className="rounded-full data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
-                    <label htmlFor={`goal-${goal.id}`} className={cn("flex-1 cursor-pointer transition-all", goal.completed && "text-muted-foreground line-through")}>
+                    <label
+                      htmlFor={goal-${goal.id}}
+                      className={cn(
+                        "flex-1 cursor-pointer transition-all",
+                        goal.completed && "text-muted-foreground line-through"
+                      )}
+                    >
                       {goal.title}
                     </label>
                   </div>
@@ -226,32 +238,52 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          {/* Upcoming Events */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <CardTitle className="text-lg font-serif italic flex items-center gap-2">
                 <CalendarDays className="h-5 w-5 text-primary" /> Próximos Eventos
               </CardTitle>
-              <Link href="/schedule" className="text-sm text-primary hover:underline font-medium">Ver agenda</Link>
+              <Link href="/schedule" className="text-sm text-primary hover:underline font-medium">
+                Ver agenda
+              </Link>
             </CardHeader>
             <CardContent>
               {upcomingEvents.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground"><p>Nenhum evento nos próximos 7 dias 🗓️</p></div>
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Nenhum evento nos próximos 7 dias 🗓️</p>
+                </div>
               ) : (
                 <div className="space-y-2">
                   {upcomingEvents.map((ev) => (
-                    <div key={ev.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/60 hover:bg-muted/30 transition-colors">
+                    <div
+                      key={ev.id}
+                      className="flex items-center gap-3 p-3 rounded-lg border border-border/60 hover:bg-muted/30 transition-colors"
+                    >
                       <div className="flex flex-col items-center justify-center w-10 shrink-0">
-                        <span className="text-xs font-semibold text-primary leading-tight">{getDateLabel(ev.date).split(",")[0]}</span>
-                        {ev.date !== today && <span className="text-xs text-muted-foreground leading-tight">{format(parseISO(ev.date), "d/MM")}</span>}
+                        <span className="text-xs font-semibold text-primary leading-tight">
+                          {getDateLabel(ev.date).split(",")[0]}
+                        </span>
+                        {ev.date !== today && (
+                          <span className="text-xs text-muted-foreground leading-tight">
+                            {format(parseISO(ev.date), "d/MM")}
+                          </span>
+                        )}
                       </div>
                       <div className="w-px h-8 bg-border shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{ev.title}</p>
                         <div className="flex items-center gap-2 mt-0.5">
                           <Clock className="h-3 w-3 text-muted-foreground shrink-0" />
-                          <span className="text-xs text-muted-foreground">{ev.time}{ev.endTime ? ` - ${ev.endTime}` : ""}</span>
-                          <span className={cn("text-xs px-1.5 py-0.5 rounded-full font-medium", CATEGORY_COLORS[ev.category] || "bg-muted text-muted-foreground")}>
+                          <span className="text-xs text-muted-foreground">
+                            {ev.time}
+                            {ev.endTime ? ` - ${ev.endTime}` : ""}
+                          </span>
+                          <span
+                            className={cn(
+                              "text-xs px-1.5 py-0.5 rounded-full font-medium",
+                              CATEGORY_COLORS[ev.category] || "bg-muted text-muted-foreground"
+                            )}
+                          >
                             {ev.category}
                           </span>
                         </div>
@@ -263,32 +295,47 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          {/* Tasks */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <CardTitle className="text-lg font-serif italic flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-primary" /> Prioridades
               </CardTitle>
-              <Link href="/tasks" className="text-sm text-primary hover:underline font-medium">Ver todas</Link>
+              <Link href="/tasks" className="text-sm text-primary hover:underline font-medium">
+                Ver todas
+              </Link>
             </CardHeader>
             <CardContent>
               {pendingTasks.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground"><p>Tudo em dia por aqui! ✨</p></div>
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Tudo em dia por aqui! ✨</p>
+                </div>
               ) : (
                 <div className="space-y-3">
-                  {pendingTasks.slice(0, 5).map(task => (
-                    <div key={task.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border">
+                  {pendingTasks.slice(0, 5).map((task) => (
+                    <div
+                      key={task.id}
+                      className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border"
+                    >
                       <Checkbox
-                        id={`task-${task.id}`}
+                        id={task-${task.id}}
                         checked={task.completed}
                         onCheckedChange={() => toggleTask(task.id)}
                         className="mt-1 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                       />
                       <div className="flex-1 min-w-0">
-                        <label htmlFor={`task-${task.id}`} className="text-sm font-medium cursor-pointer block truncate">{task.title}</label>
+                        <label
+                          htmlFor={task-${task.id}}
+                          className="text-sm font-medium cursor-pointer block truncate"
+                        >
+                          {task.title}
+                        </label>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{task.category}</span>
-                          {task.priority === "urgent" && <span className="text-xs text-destructive font-medium">Urgente</span>}
+                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                            {task.category}
+                          </span>
+                          {task.priority === "urgent" && (
+                            <span className="text-xs text-destructive font-medium">Urgente</span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -299,10 +346,7 @@ export default function Home() {
           </Card>
         </div>
 
-        {/* Right Column */}
         <div className="md:col-span-4 space-y-6">
-
-          {/* Mood */}
           <Card className="border-pink-100 overflow-hidden">
             <div className="h-2 bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300" />
             <CardHeader className="pb-3 text-center">
@@ -310,7 +354,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap justify-center gap-2">
-                {MOODS.slice(0, 14).map(emoji => (
+                {MOODS.slice(0, 14).map((emoji) => (
                   <button
                     key={emoji}
                     onClick={() => setMoodForDate(today, emoji)}
@@ -326,7 +370,6 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          {/* Water Tracker */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-serif italic flex items-center justify-center gap-2 text-blue-400">
@@ -340,7 +383,12 @@ export default function Home() {
                 </p>
                 <div className="flex gap-3 justify-center">
                   {[1, 2, 3, 4].map((i) => (
-                    <WaterDroplet key={i} index={i} liters={liters} onSet={setLitersForDate.bind(null, today)} />
+                    <WaterDroplet
+                      key={i}
+                      index={i}
+                      liters={liters}
+                      onSet={setLitersForDate.bind(null, today)}
+                    />
                   ))}
                 </div>
                 <div className="text-center">
@@ -351,10 +399,20 @@ export default function Home() {
                   <p className="text-xs text-green-600 font-medium">🎉 Meta diária atingida!</p>
                 )}
                 <div className="flex gap-1 mt-1">
-                  <Button variant="ghost" size="sm" className="text-xs h-7 px-2" onClick={() => setLitersForDate(today, 0)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs h-7 px-2"
+                    onClick={() => setLitersForDate(today, 0)}
+                  >
                     Zerar
                   </Button>
-                  <Button variant="ghost" size="sm" className="text-xs h-7 px-2 text-blue-500" onClick={() => setLitersForDate(today, Math.min(4, liters + 0.5))}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs h-7 px-2 text-blue-500"
+                    onClick={() => setLitersForDate(today, Math.min(4, liters + 0.5))}
+                  >
                     +0.5L
                   </Button>
                 </div>
@@ -362,13 +420,18 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          {/* Quick links */}
           <div className="grid grid-cols-2 gap-3">
-            <Link href="/diary" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-center">
+            <Link
+              href="/diary"
+              className="flex flex-col items-center gap-2 p-4 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-center"
+            >
               <NotebookPen className="h-6 w-6" />
               <span className="text-sm font-medium">Diário</span>
             </Link>
-            <Link href="/self-care" className="flex flex-col items-center gap-2 p-4 rounded-xl bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors text-center dark:bg-purple-900/20 dark:text-purple-300">
+            <Link
+              href="/self-care"
+              className="flex flex-col items-center gap-2 p-4 rounded-xl bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors text-center dark:bg-purple-900/20 dark:text-purple-300"
+            >
               <Sparkles className="h-6 w-6" />
               <span className="text-sm font-medium">Rituais</span>
             </Link>
