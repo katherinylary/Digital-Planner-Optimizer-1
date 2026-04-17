@@ -10,8 +10,14 @@ interface LoginScreenProps {
   onSetup: (username: string, password: string) => Promise<void>;
 }
 
-export function LoginScreen({ isSetup, onLogin, onSetup }: LoginScreenProps) {
-  const [tab, setTab] = useState<"login" | "register">(isSetup ? "login" : "register");
+export function LoginScreen({
+  isSetup,
+  onLogin,
+  onSetup,
+}: LoginScreenProps) {
+  const [tab, setTab] = useState<"login" | "register">(
+    isSetup ? "login" : "register"
+  );
 
   const [loginUser, setLoginUser] = useState("");
   const [loginPass, setLoginPass] = useState("");
@@ -30,33 +36,18 @@ export function LoginScreen({ isSetup, onLogin, onSetup }: LoginScreenProps) {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError("");
+
     if (!loginUser.trim() || !loginPass.trim()) {
       setLoginError("Preencha todos os campos.");
       return;
     }
-    if (!isSetup) {
-      const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoginError("");
-  if (!loginUser.trim() || !loginPass.trim()) {
-    setLoginError("Preencha todos os campos.");
-    return;
-  }
 
-  setLoginLoading(true);
-  try {
-    const ok = await onLogin(loginUser, loginPass);
-    if (!ok) setLoginError("Usuário ou senha incorretos.");
-  } finally {
-    setLoginLoading(false);
-  }
-};
-      return;
-    }
     setLoginLoading(true);
     try {
       const ok = await onLogin(loginUser, loginPass);
-      if (!ok) setLoginError("Usuário ou senha incorretos.");
+      if (!ok) {
+        setLoginError("Usuário ou senha incorretos.");
+      }
     } finally {
       setLoginLoading(false);
     }
@@ -65,76 +56,61 @@ export function LoginScreen({ isSetup, onLogin, onSetup }: LoginScreenProps) {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setRegError("");
+
     if (!regUser.trim() || !regPass.trim()) {
       setRegError("Preencha todos os campos.");
       return;
     }
-    if (isSetup) {
-      const handleRegister = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setRegError("");
-  if (!regUser.trim() || !regPass.trim()) {
-    setRegError("Preencha todos os campos.");
-    return;
-  }
 
-  if (regPass.length < 4) {
-    setRegError("A senha deve ter pelo menos 4 caracteres.");
-    return;
-  }
-
-  if (regPass !== regConfirm) {
-    setRegError("As senhas não coincidem.");
-    return;
-  }
-
-  setRegLoading(true);
-  try {
-    await onSetup(regUser, regPass);
-  } catch (error) {
-    setRegError(error instanceof Error ? error.message : "Erro ao criar conta.");
-  } finally {
-    setRegLoading(false);
-  }
-};);
-      return;
-    }
     if (regPass.length < 4) {
       setRegError("A senha deve ter pelo menos 4 caracteres.");
       return;
     }
+
     if (regPass !== regConfirm) {
       setRegError("As senhas não coincidem.");
       return;
     }
+
     setRegLoading(true);
     try {
       await onSetup(regUser, regPass);
+    } catch (error) {
+      setRegError(
+        error instanceof Error ? error.message : "Erro ao criar conta."
+      );
     } finally {
       setRegLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4" style={{ fontFamily: "Outfit, sans-serif" }}>
+    <div
+      className="min-h-screen bg-background flex items-center justify-center p-4"
+      style={{ fontFamily: "Outfit, sans-serif" }}
+    >
       <div className="w-full max-w-sm">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
             <Sparkles className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-serif italic text-primary">Meu Planner</h1>
+          <h1 className="text-3xl font-serif italic text-primary">
+            Meu Planner
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {tab === "login" ? "Bem-vinda de volta! 🌸" : "Crie seu acesso para começar ✨"}
+            {tab === "login"
+              ? "Bem-vinda de volta! 🌸"
+              : "Crie seu acesso para começar ✨"}
           </p>
         </div>
 
-        {/* Card */}
         <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
-          {/* Tabs */}
           <div className="flex border-b border-border">
             <button
-              onClick={() => { setTab("login"); setLoginError(""); }}
+              onClick={() => {
+                setTab("login");
+                setLoginError("");
+              }}
               className={cn(
                 "flex-1 py-3 text-sm font-semibold transition-colors",
                 tab === "login"
@@ -145,8 +121,12 @@ export function LoginScreen({ isSetup, onLogin, onSetup }: LoginScreenProps) {
             >
               Entrar
             </button>
+
             <button
-              onClick={() => { setTab("register"); setRegError(""); }}
+              onClick={() => {
+                setTab("register");
+                setRegError("");
+              }}
               className={cn(
                 "flex-1 py-3 text-sm font-semibold transition-colors",
                 tab === "register"
@@ -165,7 +145,7 @@ export function LoginScreen({ isSetup, onLogin, onSetup }: LoginScreenProps) {
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
-                    placeholder="Usuário"
+                    placeholder="Usuário ou email"
                     value={loginUser}
                     onChange={(e) => setLoginUser(e.target.value)}
                     className="pl-9"
@@ -173,6 +153,7 @@ export function LoginScreen({ isSetup, onLogin, onSetup }: LoginScreenProps) {
                     data-testid="input-username"
                   />
                 </div>
+
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
@@ -189,30 +170,49 @@ export function LoginScreen({ isSetup, onLogin, onSetup }: LoginScreenProps) {
                     onClick={() => setShowLoginPass(!showLoginPass)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    {showLoginPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showLoginPass ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
+
                 {loginError && (
-                  <p className="text-xs text-destructive text-center font-medium" data-testid="text-login-error">{loginError}</p>
-                )}
-                <Button type="submit" className="w-full" disabled={loginLoading} data-testid="button-login-submit">
-                  {loginLoading ? "Aguarde..." : "Entrar"}
-                </Button>
-                {!isSetup && (
-                  <p className="text-xs text-center text-muted-foreground pt-1">
-                    Ainda não tem conta?{" "}
-                    <button type="button" onClick={() => setTab("register")} className="text-primary underline font-medium">
-                      Criar agora
-                    </button>
+                  <p
+                    className="text-xs text-destructive text-center font-medium"
+                    data-testid="text-login-error"
+                  >
+                    {loginError}
                   </p>
                 )}
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loginLoading}
+                  data-testid="button-login-submit"
+                >
+                  {loginLoading ? "Aguarde..." : "Entrar"}
+                </Button>
+
+                <p className="text-xs text-center text-muted-foreground pt-1">
+                  Ainda não tem conta?{" "}
+                  <button
+                    type="button"
+                    onClick={() => setTab("register")}
+                    className="text-primary underline font-medium"
+                  >
+                    Criar agora
+                  </button>
+                </p>
               </form>
             ) : (
               <form onSubmit={handleRegister} className="space-y-3">
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
-                    placeholder="Escolha um usuário"
+                    placeholder="Digite seu email"
                     value={regUser}
                     onChange={(e) => setRegUser(e.target.value)}
                     className="pl-9"
@@ -220,6 +220,7 @@ export function LoginScreen({ isSetup, onLogin, onSetup }: LoginScreenProps) {
                     data-testid="input-register-username"
                   />
                 </div>
+
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
@@ -236,9 +237,14 @@ export function LoginScreen({ isSetup, onLogin, onSetup }: LoginScreenProps) {
                     onClick={() => setShowRegPass(!showRegPass)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    {showRegPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showRegPass ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
+
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
@@ -255,26 +261,46 @@ export function LoginScreen({ isSetup, onLogin, onSetup }: LoginScreenProps) {
                     onClick={() => setShowRegConfirm(!showRegConfirm)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    {showRegConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showRegConfirm ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
+
                 {regError && (
-                  <p className="text-xs text-destructive text-center font-medium" data-testid="text-register-error">{regError}</p>
-                )}
-                <Button type="submit" className="w-full" disabled={regLoading} data-testid="button-register-submit">
-                  {regLoading ? "Aguarde..." : "Criar acesso"}
-                </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  Sua senha ficará salva com segurança no seu navegador.
-                </p>
-                {isSetup && (
-                  <p className="text-xs text-center text-muted-foreground pt-1">
-                    Já tem conta?{" "}
-                    <button type="button" onClick={() => setTab("login")} className="text-primary underline font-medium">
-                      Fazer login
-                    </button>
+                  <p
+                    className="text-xs text-destructive text-center font-medium"
+                    data-testid="text-register-error"
+                  >
+                    {regError}
                   </p>
                 )}
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={regLoading}
+                  data-testid="button-register-submit"
+                >
+                  {regLoading ? "Aguarde..." : "Criar acesso"}
+                </Button>
+
+                <p className="text-xs text-center text-muted-foreground">
+                  Sua senha ficará salva com segurança na sua conta.
+                </p>
+
+                <p className="text-xs text-center text-muted-foreground pt-1">
+                  Já tem conta?{" "}
+                  <button
+                    type="button"
+                    onClick={() => setTab("login")}
+                    className="text-primary underline font-medium"
+                  >
+                    Fazer login
+                  </button>
+                </p>
               </form>
             )}
           </div>
