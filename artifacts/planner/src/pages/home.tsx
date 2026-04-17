@@ -88,7 +88,7 @@ function WaterDroplet({ index, liters, onSet }: { index: number; liters: number;
   };
 
   return (
-    <div className="flex flex-col items-center gap-1" title={${index - 0.5}L / ${index}L}>
+    <div className="flex flex-col items-center gap-1" title={`${index - 0.5}L / ${index}L`}>
       <div className="relative w-10 h-14 cursor-pointer select-none">
         <div className="absolute inset-0 overflow-hidden rounded-b-full rounded-t-[60%]">
           <div className={cn("absolute inset-0 transition-colors duration-200", isFull ? "bg-blue-400" : isHalf ? "bg-blue-300" : "bg-muted/50")} />
@@ -100,12 +100,12 @@ function WaterDroplet({ index, liters, onSet }: { index: number; liters: number;
           <button
             onClick={handleFullClick}
             className="flex-1 w-full rounded-t-[60%]"
-            title={isFull ? Reduzir para ${halfVal}L : Completar ${index}L}
+            title={isFull ? `Reduzir para ${halfVal}L` : `Completar ${index}L`}
           />
           <button
             onClick={handleHalfClick}
             className="flex-1 w-full rounded-b-full"
-            title={isHalf ? Remover ${halfVal}L : Adicionar ${halfVal}L}
+            title={isHalf ? `Remover ${halfVal}L` : `Adicionar ${halfVal}L`}
           />
         </div>
         {(isFull || isHalf) && (
