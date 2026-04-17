@@ -96,20 +96,26 @@ export function useEvents() {
     );
   }, []);
 
-  const updateEvent = useCallback(async (id: string, updates: Partial<Event>) => {
-    const token = getToken();
-    if (!token) {
-      throw new Error("Usuário não autenticado");
-    }
+  const updateEvent = async (id: string, updates: Partial<Event>) => {
+  const token = localStorage.getItem("planner_auth_token");
 
-    const res = await fetch(`${API_URL}/events/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
-      },
-      body: JSON.stringify(updates),
-    });
+  const res = await fetch(`${API_URL}/events/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token || "",
+    },
+    body: JSON.stringify(updates),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Erro ao atualizar evento");
+  }
+
+  setEvents((prev) => prev.map((e) => (e.id === id ? data : e)));
+};
 
     const data = await res.json();
 
@@ -127,18 +133,18 @@ export function useEvents() {
     );
   }, []);
 
-  const deleteEvent = useCallback(async (id: string) => {
-    const token = getToken();
-    if (!token) {
-      throw new Error("Usuário não autenticado");
-    }
+  const deleteEvent = async (id: string) => {
+  const token = localStorage.getItem("planner_auth_token");
 
-    const res = await fetch(`${API_URL}/events/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: token,
-      },
-    });
+  await fetch(`${API_URL}/events/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: token || "",
+    },
+  });
+
+  setEvents((prev) => prev.filter((e) => e.id !== id));
+};
 
     const data = await res.json();
 
