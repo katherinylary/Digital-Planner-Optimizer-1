@@ -168,7 +168,6 @@ const handleAdd = () => {
     setForm({ ...form, participants: e.target.value })
   }
 />
-                <Input
   placeholder="Emails dos convidados (separados por vírgula)"
   value={form.participants}
   onChange={(e) =>
