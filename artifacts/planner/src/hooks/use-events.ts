@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const API_URL = "https://digital-planner-optimizer-1-4.onrender.com";
 const TOKEN_KEY = "planner_auth_token";
@@ -11,10 +11,8 @@ export interface Event {
   endTime?: string;
   description?: string;
   category: string;
-
-  participantEmails?: string[]; // 👈 novo
-  isOwner?: boolean;            // 👈 novo
-  ownerEmail?: string;          // 👈 opcional
+  isOwner?: boolean;
+  ownerEmail?: string;
 }
 
 function getToken() {
@@ -23,144 +21,74 @@ function getToken() {
 
 export function useEvents() {
   const [events, setEvents] = useState<Event[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   const loadEvents = useCallback(async () => {
     const token = getToken();
+    if (!token) return;
 
-    if (!token) {
-      setEvents([]);
-      setIsLoading(false);
-      return;
-    }
+    const res = await fetch(${API_URL}/events, {
+      headers: {
+        Authorization: token,
+      },
+    });
 
-    try {
-      const res = await fetch(`${API_URL}/events`, {
-        headers: {
-          Authorization: token,
-        },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.error("Erro ao carregar eventos:", data);
-        setEvents([]);
-      } else {
-        setEvents(data);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar eventos:", error);
-      setEvents([]);
-    } finally {
-      setIsLoading(false);
-    }
+    const data = await res.json();
+    if (res.ok) setEvents(data);
   }, []);
 
   useEffect(() => {
     loadEvents();
   }, [loadEvents]);
 
-  const addEvent = async (event: Omit<Event, "id">) => {
-  const token = localStorage.getItem("planner_auth_token");
+  const addEvent = async (event: any) => {
+    const token = getToken();
 
-  const res = await fetch(`${API_URL}/events`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token || "",
-    },
-    body: JSON.stringify(event),
-  });
+    const res = await fetch(`${API_URL}/events`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+      body: JSON.stringify(event),
+    });
 
-  const data = await res.json();
+    const data = await res.json();
+    if (res.ok) setEvents((prev) => [...prev, data]);
+  };
 
-  if (!res.ok) {
-    throw new Error(data.error || "Erro ao criar evento");
-  }
+  const updateEvent = async (id: string, updates: any) => {
+    const token = getToken();
 
-  setEvents((prev) => [data, ...prev]);
-};
+    const res = await fetch(`${API_URL}/events/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+      body: JSON.stringify(updates),
+    });
 
     const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data.error || "Erro ao criar evento");
+    if (res.ok) {
+      setEvents((prev) =>
+        prev.map((e) => (e.id === id ? data : e))
+      );
     }
-
-    setEvents((prev) =>
-      [...prev, data].sort((a, b) => {
-        const d = a.date.localeCompare(b.date);
-        return d !== 0 ? d : a.time.localeCompare(b.time);
-      })
-    );
-  }, []);
-
-  const updateEvent = async (id: string, updates: Partial<Event>) => {
-  const token = localStorage.getItem("planner_auth_token");
-
-  const res = await fetch(`${API_URL}/events/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token || "",
-    },
-    body: JSON.stringify(updates),
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.error || "Erro ao atualizar evento");
-  }
-
-  setEvents((prev) => prev.map((e) => (e.id === id ? data : e)));
-};
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Erro ao atualizar evento");
-    }
-
-    setEvents((prev) =>
-      prev
-        .map((e) => (e.id === id ? data : e))
-        .sort((a, b) => {
-          const d = a.date.localeCompare(b.date);
-          return d !== 0 ? d : a.time.localeCompare(b.time);
-        })
-    );
-  }, []);
+  };
 
   const deleteEvent = async (id: string) => {
-  const token = localStorage.getItem("planner_auth_token");
+    const token = getToken();
 
-  await fetch(`${API_URL}/events/${id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: token || "",
-    },
-  });
-
-  setEvents((prev) => prev.filter((e) => e.id !== id));
-};
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Erro ao deletar evento");
-    }
+    await fetch(`${API_URL}/events/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: token,
+      },
+    });
 
     setEvents((prev) => prev.filter((e) => e.id !== id));
-  }, []);
-
-  return {
-    events,
-    isLoading,
-    addEvent,
-    updateEvent,
-    deleteEvent,
-    reloadEvents: loadEvents,
   };
+
+  return { events, addEvent, updateEvent, deleteEvent };
 }
