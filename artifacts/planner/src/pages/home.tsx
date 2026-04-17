@@ -103,7 +103,7 @@ function WaterDroplet({
   };
 
   return (
-    <div className="flex flex-col items-center gap-1" title={${index - 0.5}L / ${index}L}>
+    <div className="flex flex-col items-center gap-1" title={`${index - 0.5}L / ${index}L`}>
       <div className="relative w-10 h-14 cursor-pointer select-none">
         <div className="absolute inset-0 overflow-hidden rounded-b-full rounded-t-[60%]">
           <div
@@ -121,12 +121,12 @@ function WaterDroplet({
           <button
             onClick={handleFullClick}
             className="flex-1 w-full rounded-t-[60%]"
-            title={isFull ? Reduzir para ${halfVal}L : Completar ${index}L}
+            title={isFull ? `Reduzir para ${halfVal}L` : `Completar ${index}L`}
           />
           <button
             onClick={handleHalfClick}
             className="flex-1 w-full rounded-b-full"
-            title={isHalf ? Remover ${halfVal}L : Adicionar ${halfVal}L}
+            title={isHalf ? `Remover ${halfVal}L` : `Adicionar ${halfVal}L`}
           />
         </div>
 
@@ -230,13 +230,13 @@ export default function Home() {
                     className="flex items-center gap-3 bg-background/50 p-3 rounded-lg border border-border/50"
                   >
                     <Checkbox
-                      id={goal-${goal.id}}
+                      id={`goal-${goal.id}`}
                       checked={goal.completed}
                       onCheckedChange={() => toggleGoal(goal.id)}
                       className="rounded-full data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
                     <label
-                      htmlFor={goal-${goal.id}}
+                      htmlFor={`goal-${goal.id}`}
                       className={cn(
                         "flex-1 cursor-pointer transition-all",
                         goal.completed && "text-muted-foreground line-through"
@@ -341,14 +341,14 @@ export default function Home() {
                       className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors border border-transparent hover:border-border"
                     >
                       <Checkbox
-                        id={task-${task.id}}
+                        id={`task-${task.id}`}
                         checked={task.completed}
                         onCheckedChange={() => toggleTask(task.id)}
                         className="mt-1 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                       />
                       <div className="flex-1 min-w-0">
                         <label
-                          htmlFor={task-${task.id}}
+                          htmlFor={`task-${task.id}`}
                           className="text-sm font-medium cursor-pointer block truncate"
                         >
                           {task.title}
