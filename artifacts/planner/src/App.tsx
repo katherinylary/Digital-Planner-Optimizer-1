@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Task = {
   id: number;
@@ -9,21 +9,51 @@ export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [text, setText] = useState("");
 
-  function addTask() {
+  const API = "https://digital-planner-optimizer-1-4.onrender.com";
+
+  async function loadTasks() {
+    try {
+      const res = await fetch(`${API}/tasks`);
+      const data = await res.json();
+      setTasks(data);
+    } catch (err) {
+      console.log("Erro ao carregar tarefas", err);
+    }
+  }
+
+  async function addTask() {
     if (!text.trim()) return;
 
-    const newTask = {
-      id: Date.now(),
-      text,
-    };
+    try {
+      const res = await fetch(`${API}/tasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
 
-    setTasks([...tasks, newTask]);
-    setText("");
+      const newTask = await res.json();
+      setTasks((prev) => [...prev, newTask]);
+      setText("");
+    } catch (err) {
+      console.log("Erro ao adicionar tarefa", err);
+    }
   }
 
-  function deleteTask(id: number) {
-    setTasks(tasks.filter((t) => t.id !== id));
+  async function deleteTask(id: number) {
+    try {
+      await fetch(`${API}/tasks/${id}`, {
+        method: "DELETE",
+      });
+
+      setTasks((prev) => prev.filter((t) => t.id !== id));
+    } catch (err) {
+      console.log("Erro ao deletar tarefa", err);
+    }
   }
+
+  useEffect(() => {
+    loadTasks();
+  }, []);
 
   return (
     <div style={styles.page}>
