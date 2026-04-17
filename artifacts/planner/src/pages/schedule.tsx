@@ -464,7 +464,7 @@ export default function Schedule() {
                                   onClick={() => openEdit(ev)}
                                   className="text-primary/70 hover:text-primary transition-colors p-1"
                                   title="Editar"
-                                  data-testid={button-edit-event-${ev.id}}
+                                  data-testid={`button-edit-event-${ev.id}`}
                                 >
                                   <Pencil className="h-3.5 w-3.5" />
                                 </button>
@@ -473,7 +473,7 @@ export default function Schedule() {
                                   onClick={() => openPostpone(ev)}
                                   className="text-primary/70 hover:text-primary transition-colors p-1"
                                   title="Adiar"
-                                  data-testid={button-postpone-event-${ev.id}}
+                                  data-testid={`button-postpone-event-${ev.id}`}
                                 >
                                   <CalendarClock className="h-3.5 w-3.5" />
                                 </button>
@@ -481,7 +481,7 @@ export default function Schedule() {
                                 <button
                                   onClick={() => deleteEvent(ev.id)}
                                   className="text-destructive/70 hover:text-destructive transition-colors p-1"
-                                  data-testid={button-delete-event-${ev.id}}
+                                  data-testid={`button-delete-event-${ev.id}`}
                                 >
                                   <Trash2 className="h-3.5 w-3.5" />
                                 </button>
