@@ -351,17 +351,25 @@ app.get("/events", auth, async (req, res) => {
   try {
     const result = await pool.query(
       `
-      SELECT
-        id::text AS id,
-        title,
-        date,
-        time,
-        end_time AS "endTime",
-        description,
-        category
-      FROM events
-      WHERE user_id = $1
-      ORDER BY date ASC, time ASC
+      SELECT DISTINCT
+        e.id::text AS id,
+        e.title,
+        e.date,
+        e.time,
+        e.end_time AS "endTime",
+        e.description,
+        e.category,
+        e.user_id::text AS "ownerId",
+        u.email AS "ownerEmail",
+        CASE
+          WHEN e.user_id = $1 THEN true
+          ELSE false
+        END AS "isOwner"
+      FROM events e
+      JOIN users u ON u.id = e.user_id
+      LEFT JOIN event_participants ep ON ep.event_id = e.id
+      WHERE e.user_id = $1 OR ep.user_id = $1
+      ORDER BY e.date ASC, e.time ASC
       `,
       [req.userId]
     );
