@@ -91,6 +91,11 @@ async function initDB() {
       UNIQUE(event_id, user_id)
     );
   `);
+  CREATE TABLE IF NOT EXISTS event_participants (
+  id SERIAL PRIMARY KEY,
+  event_id INTEGER REFERENCES events(id) ON DELETE CASCADE,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
+);
 }
 
 function auth(req, res, next) {
