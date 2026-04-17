@@ -35,7 +35,22 @@ export function LoginScreen({ isSetup, onLogin, onSetup }: LoginScreenProps) {
       return;
     }
     if (!isSetup) {
-      setLoginError("Nenhuma conta cadastrada. Crie seu acesso primeiro.");
+      const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoginError("");
+  if (!loginUser.trim() || !loginPass.trim()) {
+    setLoginError("Preencha todos os campos.");
+    return;
+  }
+
+  setLoginLoading(true);
+  try {
+    const ok = await onLogin(loginUser, loginPass);
+    if (!ok) setLoginError("Usuário ou senha incorretos.");
+  } finally {
+    setLoginLoading(false);
+  }
+};
       return;
     }
     setLoginLoading(true);
@@ -55,7 +70,33 @@ export function LoginScreen({ isSetup, onLogin, onSetup }: LoginScreenProps) {
       return;
     }
     if (isSetup) {
-      setRegError("Já existe uma conta cadastrada. Faça login ou altere a senha nas Configurações.");
+      const handleRegister = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setRegError("");
+  if (!regUser.trim() || !regPass.trim()) {
+    setRegError("Preencha todos os campos.");
+    return;
+  }
+
+  if (regPass.length < 4) {
+    setRegError("A senha deve ter pelo menos 4 caracteres.");
+    return;
+  }
+
+  if (regPass !== regConfirm) {
+    setRegError("As senhas não coincidem.");
+    return;
+  }
+
+  setRegLoading(true);
+  try {
+    await onSetup(regUser, regPass);
+  } catch (error) {
+    setRegError(error instanceof Error ? error.message : "Erro ao criar conta.");
+  } finally {
+    setRegLoading(false);
+  }
+};);
       return;
     }
     if (regPass.length < 4) {
