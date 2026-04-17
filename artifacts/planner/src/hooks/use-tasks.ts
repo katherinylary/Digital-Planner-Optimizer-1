@@ -41,7 +41,7 @@ export function useTasks() {
     }
 
     try {
-      const res = await fetch(${API_URL}/tasks, {
+      const res = await fetch(`${API_URL}/tasks`, {
         headers: {
           Authorization: token,
         },
@@ -80,7 +80,7 @@ export function useTasks() {
         createdAt: Date.now(),
       };
 
-      const res = await fetch(${API_URL}/tasks, {
+      const res = await fetch(`${API_URL}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -101,44 +101,50 @@ export function useTasks() {
     []
   );
 
-  const updateTask = useCallback(async (id: string, updates: Partial<Task>) => {
-    const token = getToken();
-    if (!token) {
-      throw new Error("Usuário não autenticado");
-    }
+  const updateTask = useCallback(
+    async (id: string, updates: Partial<Task>) => {
+      const token = getToken();
+      if (!token) {
+        throw new Error("Usuário não autenticado");
+      }
 
-    const current = tasks.find((t) => t.id === id);
-    if (!current) return;
+      const current = tasks.find((t) => t.id === id);
+      if (!current) return;
 
-    const payload = {
-      ...current,
-      ...updates,
-    };
+      const payload = {
+        ...current,
+        ...updates,
+      };
 
-    const res = await fetch(${API_URL}/tasks/${id}, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
-      },
-      body: JSON.stringify(payload),
-    });
+      const res = await fetch(`${API_URL}/tasks/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+        body: JSON.stringify(payload),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data.error || "Erro ao atualizar tarefa");
-    }
+      if (!res.ok) {
+        throw new Error(data.error || "Erro ao atualizar tarefa");
+      }
 
-    setTasks((prev) => prev.map((t) => (t.id === id ? data : t)));
-  }, [tasks]);
+      setTasks((prev) => prev.map((t) => (t.id === id ? data : t)));
+    },
+    [tasks]
+  );
 
-  const toggleTask = useCallback(async (id: string) => {
-    const current = tasks.find((t) => t.id === id);
-    if (!current) return;
+  const toggleTask = useCallback(
+    async (id: string) => {
+      const current = tasks.find((t) => t.id === id);
+      if (!current) return;
 
-    await updateTask(id, { completed: !current.completed });
-  }, [tasks, updateTask]);
+      await updateTask(id, { completed: !current.completed });
+    },
+    [tasks, updateTask]
+  );
 
   const deleteTask = useCallback(async (id: string) => {
     const token = getToken();
