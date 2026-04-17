@@ -529,7 +529,7 @@ app.patch("/events/:id", auth, async (req, res) => {
 
     if (participantEmails) {
       await pool.query(
-        DELETE FROM event_participants WHERE event_id = $1,
+        `DELETE FROM event_participants WHERE event_id = $1`,
         [req.params.id]
       );
 
