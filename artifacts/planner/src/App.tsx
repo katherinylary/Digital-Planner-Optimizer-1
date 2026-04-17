@@ -9,7 +9,7 @@ export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [text, setText] = useState("");
 
-  const API = "https://digital-planner-api.onrender.com";;
+  const API = "https://digital-planner-optimizer-1-4.onrender.com";;
 
   async function loadTasks() {
     const res = await fetch(`${API}/tasks`);
