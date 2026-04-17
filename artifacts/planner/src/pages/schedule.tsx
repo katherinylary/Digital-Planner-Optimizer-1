@@ -534,42 +534,42 @@ export default function Schedule() {
       ))}
     </div>
 
-    <div className="grid grid-cols-7 gap-1">
-      {Array.from({ length: startDay }).map((_, i) => (
-        <div key={`empty-${i}`} />
-      ))}
-              {monthDays.map((day) => {
-                const ds = format(day, "yyyy-MM-dd");
-                const count = events.filter((e) => e.date === ds).length;
-                const isToday = isSameDay(day, new Date());
-                const isSelected = isSameDay(day, selectedDate);
+   <div className="grid grid-cols-7 gap-1">
+  {Array.from({ length: startDay }).map((_, i) => (
+    <div key={empty-${i}} />
+  ))}
 
-                return (
-                  <button
-                    key={ds}
-                    onClick={() => {
-                      setSelectedDate(day);
-                      setView("timeline");
-                    }}
-                    className={cn(
-                      "aspect-square rounded-lg text-sm flex flex-col items-center justify-center gap-0.5 transition-colors",
-                      isToday && "ring-2 ring-primary",
-                      isSelected && "bg-primary text-primary-foreground",
-                      !isSelected && "hover:bg-muted"
-                    )}
-                    data-testid={`calendar-day-${ds}`}
-                  >
-                    {format(day, "d")}
-                    {count > 0 && (
-                      <div className={cn("w-1.5 h-1.5 rounded-full", isSelected ? "bg-primary-foreground" : "bg-primary")} />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-}
+  {monthDays.map((day) => {
+    const ds = format(day, "yyyy-MM-dd");
+    const count = events.filter((e) => e.date === ds).length;
+    const isToday = isSameDay(day, new Date());
+    const isSelected = isSameDay(day, selectedDate);
+
+    return (
+      <button
+        key={ds}
+        onClick={() => {
+          setSelectedDate(day);
+          setView("timeline");
+        }}
+        className={cn(
+          "aspect-square rounded-lg text-sm flex flex-col items-center justify-center gap-0.5 transition-colors",
+          isToday && "ring-2 ring-primary",
+          isSelected && "bg-primary text-primary-foreground",
+          !isSelected && "hover:bg-muted"
+        )}
+        data-testid={calendar-day-${ds}}
+      >
+        {format(day, "d")}
+        {count > 0 && (
+          <div
+            className={cn(
+              "w-1.5 h-1.5 rounded-full",
+              isSelected ? "bg-primary-foreground" : "bg-primary"
+            )}
+          />
+        )}
+      </button>
+    );
+  })}
+</div>
