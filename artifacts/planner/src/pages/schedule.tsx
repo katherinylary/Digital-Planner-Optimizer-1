@@ -346,17 +346,21 @@ export default function Schedule() {
               <div className="grid grid-cols-2 gap-2">
                 {POSTPONE_OPTIONS.map((opt) => (
                   <Button
-                    key={opt.label}
-                    variant="outline"
-                    onClick={() => handlePostpone(addDaysToDate(postponingEvent.date, opt.days))}
-                    data-testid={button-postpone-${opt.days}}
-                    className="h-auto py-3 flex flex-col"
-                  >
-                    <span className="font-semibold">{opt.label}</span>
-                    <span className="text-xs text-muted-foreground mt-0.5">
-                      {format(new Date(addDaysToDate(postponingEvent.date, opt.days) + "T12:00:00"), "d 'de' MMM", { locale: ptBR })}
-                    </span>
-                  </Button>
+  key={opt.label}
+  variant="outline"
+  onClick={() => handlePostpone(addDaysToDate(postponingEvent.date, opt.days))}
+  data-testid={`button-postpone-${opt.days}`}
+  className="h-auto py-3 flex flex-col"
+>
+  <span className="font-semibold">{opt.label}</span>
+  <span className="text-xs text-muted-foreground mt-0.5">
+    {format(
+      new Date(addDaysToDate(postponingEvent.date, opt.days) + "T12:00:00"),
+      "d 'de' MMM",
+      { locale: ptBR }
+    )}
+  </span>
+</Button>
                 ))}
               </div>
 
