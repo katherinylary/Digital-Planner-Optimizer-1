@@ -92,7 +92,7 @@ export default function App() {
     return (
       <div style={styles.page}>
         <div style={styles.card}>
-          <h2>Login / Cadastro</h2>
+          <h2 style={{ marginBottom: 15 }}>Login / Cadastro</h2>
 
           <input
             placeholder="Email"
@@ -124,7 +124,7 @@ export default function App() {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h1>🧠 Meu Planejador</h1>
+        <h1 style={{ marginBottom: 10 }}>🧠 Meu Planejador</h1>
 
         <button onClick={logout} style={styles.logout}>
           Sair
@@ -137,7 +137,7 @@ export default function App() {
             placeholder="Nova tarefa..."
             style={styles.input}
           />
-          <button onClick={addTask} style={styles.button}>
+          <button onClick={addTask} style={styles.addButton}>
             +
           </button>
         </div>
@@ -146,7 +146,12 @@ export default function App() {
           {tasks.map((task) => (
             <div key={task.id} style={styles.task}>
               <span>{task.text}</span>
-              <button onClick={() => deleteTask(task.id)}>❌</button>
+              <button
+                onClick={() => deleteTask(task.id)}
+                style={styles.delete}
+              >
+                ✕
+              </button>
             </div>
           ))}
         </div>
@@ -161,59 +166,96 @@ const styles: any = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "#f1f5f9",
-    fontFamily: "system-ui",
+    background: "linear-gradient(135deg, #eef2ff, #f8fafc)",
+    fontFamily: "Inter, system-ui",
   },
+
   card: {
-    width: 350,
-    background: "#fff",
-    padding: 20,
-    borderRadius: 12,
-    boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+    width: 360,
+    background: "#ffffff",
+    padding: 24,
+    borderRadius: 20,
+    boxShadow: "0 20px 40px rgba(0,0,0,0.08)",
+    position: "relative",
   },
+
   input: {
     width: "100%",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 8,
-    border: "1px solid #ddd",
+    padding: 12,
+    marginBottom: 12,
+    borderRadius: 12,
+    border: "1px solid #e5e7eb",
+    fontSize: 14,
+    outline: "none",
   },
+
   button: {
     width: "100%",
-    padding: 10,
+    padding: 12,
+    background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+    color: "#fff",
+    border: "none",
+    borderRadius: 12,
+    marginBottom: 10,
+    cursor: "pointer",
+    fontWeight: "600",
+  },
+
+  buttonSecondary: {
+    width: "100%",
+    padding: 12,
+    background: "#f1f5f9",
+    border: "none",
+    borderRadius: 12,
+    cursor: "pointer",
+    fontWeight: "500",
+  },
+
+  logout: {
+    position: "absolute",
+    top: 15,
+    right: 15,
+    background: "#fee2e2",
+    border: "none",
+    color: "#b91c1c",
+    padding: "6px 10px",
+    borderRadius: 8,
+    cursor: "pointer",
+    fontSize: 12,
+  },
+
+  row: {
+    display: "flex",
+    gap: 8,
+    marginBottom: 15,
+  },
+
+  addButton: {
+    width: 50,
     background: "#4f46e5",
     color: "#fff",
     border: "none",
-    borderRadius: 8,
-    marginBottom: 10,
+    borderRadius: 12,
     cursor: "pointer",
+    fontSize: 20,
   },
-  buttonSecondary: {
-    width: "100%",
-    padding: 10,
-    background: "#e5e7eb",
-    border: "none",
-    borderRadius: 8,
-    cursor: "pointer",
-  },
-  logout: {
-    background: "transparent",
-    border: "none",
-    color: "red",
-    float: "right",
-    cursor: "pointer",
-  },
-  row: {
-    display: "flex",
-    gap: 10,
-    marginBottom: 15,
-  },
+
   task: {
     display: "flex",
     justifyContent: "space-between",
-    padding: 10,
+    alignItems: "center",
+    padding: 12,
     background: "#f8fafc",
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 8,
+    border: "1px solid #e5e7eb",
+  },
+
+  delete: {
+    background: "#fee2e2",
+    border: "none",
+    borderRadius: 8,
+    padding: "4px 8px",
+    cursor: "pointer",
   },
 };
