@@ -1,107 +1,119 @@
 import { useState, useEffect, useCallback } from "react";
 
-const CREDENTIALS_KEY = "planner_auth_credentials";
-const SESSION_KEY = "planner_session";
-
-interface Credentials {
-  username: string;
-  passwordHash: string;
-}
-
-async function sha256(text: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(text);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-function getStoredCredentials(): Credentials | null {
-  const raw = localStorage.getItem(CREDENTIALS_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
+const API_URL = "https://digital-planner-optimizer-1-4.onrender.com";
+const TOKEN_KEY = "planner_auth_token";
+const USERNAME_KEY = "planner_auth_username";
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isSetup, setIsSetup] = useState(false);
+  const [isSetup, setIsSetup] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [storedUsername, setStoredUsername] = useState("");
 
   useEffect(() => {
-    const creds = getStoredCredentials();
-    if (!creds) {
-      setIsSetup(false);
-    } else {
-      setIsSetup(true);
-      setStoredUsername(creds.username);
+    const token = localStorage.getItem(TOKEN_KEY);
+    const username = localStorage.getItem(USERNAME_KEY) || "";
+
+    if (token) {
+      setIsAuthenticated(true);
     }
 
-    const session = sessionStorage.getItem(SESSION_KEY);
-    if (session === "authenticated") {
-      setIsAuthenticated(true);
+    if (username) {
+      setStoredUsername(username);
     }
 
     setIsLoading(false);
   }, []);
 
   const setupCredentials = useCallback(async (username: string, password: string) => {
-    const passwordHash = await sha256(password);
-    const creds: Credentials = { username, passwordHash };
-    localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(creds));
-    sessionStorage.setItem(SESSION_KEY, "authenticated");
+    const res = await fetch(${API_URL}/register, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: username,
+        password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Erro ao criar conta");
+    }
+
+    const loginRes = await fetch(${API_URL}/login, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: username,
+        password,
+      }),
+    });
+
+    const loginData = await loginRes.json();
+
+    if (!loginRes.ok || !loginData.token) {
+      throw new Error(loginData.error || "Erro ao entrar após cadastro");
+    }
+
+    localStorage.setItem(TOKEN_KEY, loginData.token);
+    localStorage.setItem(USERNAME_KEY, username);
+
     setStoredUsername(username);
-    setIsSetup(true);
     setIsAuthenticated(true);
+    setIsSetup(true);
   }, []);
 
   const login = useCallback(async (username: string, password: string): Promise<boolean> => {
-    const creds = getStoredCredentials();
-    if (!creds) return false;
-    const hash = await sha256(password);
-    if (creds.username === username && creds.passwordHash === hash) {
-      sessionStorage.setItem(SESSION_KEY, "authenticated");
+    try {
+      const res = await fetch(${API_URL}/login, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: username,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.token) {
+        return false;
+      }
+
+      localStorage.setItem(TOKEN_KEY, data.token);
+      localStorage.setItem(USERNAME_KEY, username);
+
+      setStoredUsername(username);
       setIsAuthenticated(true);
+      setIsSetup(true);
+
       return true;
+    } catch (error) {
+      console.error("Erro no login:", error);
+      return false;
     }
-    return false;
   }, []);
 
   const logout = useCallback(() => {
-    sessionStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USERNAME_KEY);
     setIsAuthenticated(false);
+    setStoredUsername("");
   }, []);
 
-  const changeCredentials = useCallback(async (
-    currentPassword: string,
-    newUsername: string,
-    newPassword: string
-  ): Promise<boolean> => {
-    const creds = getStoredCredentials();
-    if (!creds) return false;
-    const currentHash = await sha256(currentPassword);
-    if (creds.passwordHash !== currentHash) return false;
-    const newHash = await sha256(newPassword);
-    const updated: Credentials = { username: newUsername, passwordHash: newHash };
-    localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(updated));
-    setStoredUsername(newUsername);
-    return true;
+  const changeCredentials = useCallback(async () => {
+    return false;
   }, []);
 
-  const removeAuth = useCallback(async (currentPassword: string): Promise<boolean> => {
-    const creds = getStoredCredentials();
-    if (!creds) return false;
-    const hash = await sha256(currentPassword);
-    if (creds.passwordHash !== hash) return false;
-    localStorage.removeItem(CREDENTIALS_KEY);
-    sessionStorage.removeItem(SESSION_KEY);
-    setIsSetup(false);
-    setIsAuthenticated(true);
-    return true;
+  const removeAuth = useCallback(async () => {
+    return false;
   }, []);
 
   return {
