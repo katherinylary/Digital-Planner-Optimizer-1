@@ -35,7 +35,15 @@ export default function Schedule() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const [addOpen, setAddOpen] = useState(false);
-  const [form, setForm] = useState({ title: "", date: format(new Date(), "yyyy-MM-dd"), time: "09:00", endTime: "10:00", description: "", category: "Pessoal" });
+  const [form, setForm] = useState({
+  title: "",
+  date: format(new Date(), "yyyy-MM-dd"),
+  time: "09:00",
+  endTime: "10:00",
+  description: "",
+  category: "Pessoal",
+  participants: ""
+});
 
   const [editOpen, setEditOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
