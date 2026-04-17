@@ -47,9 +47,12 @@ async function initDB() {
     ADD COLUMN IF NOT EXISTS category TEXT DEFAULT 'Autocuidado',
     ADD COLUMN IF NOT EXISTS completed BOOLEAN DEFAULT false,
     ADD COLUMN IF NOT EXISTS created_at BIGINT;
+  `);
+
+  await pool.query(`
     UPDATE tasks
-SET created_at = EXTRACT(EPOCH FROM NOW()) * 1000
-WHERE created_at IS NULL;
+    SET created_at = EXTRACT(EPOCH FROM NOW()) * 1000
+    WHERE created_at IS NULL;
   `);
 
   await pool.query(`
@@ -65,6 +68,19 @@ WHERE created_at IS NULL;
        OR priority IS NULL
        OR category IS NULL
        OR created_at IS NULL;
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS events (
+      id SERIAL PRIMARY KEY,
+      title TEXT NOT NULL,
+      date TEXT NOT NULL,
+      time TEXT NOT NULL,
+      end_time TEXT,
+      description TEXT,
+      category TEXT NOT NULL,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+    );
   `);
 }
 
@@ -322,12 +338,159 @@ app.delete("/tasks/:id", auth, async (req, res) => {
   }
 });
 
+app.get("/events", auth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        id::text AS id,
+        title,
+        date,
+        time,
+        end_time AS "endTime",
+        description,
+        category
+      FROM events
+      WHERE user_id = $1
+      ORDER BY date ASC, time ASC
+      `,
+      [req.userId]
+    );
+
+    return res.json(result.rows);
+  } catch (error) {
+    console.error("Erro no GET /events:", error);
+    return res.status(500).json({ error: "Erro ao buscar eventos" });
+  }
+});
+
+app.post("/events", auth, async (req, res) => {
+  try {
+    const {
+      title,
+      date,
+      time,
+      endTime = null,
+      description = "",
+      category = "Pessoal",
+    } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: "Título é obrigatório" });
+    }
+
+    if (!date || !time) {
+      return res.status(400).json({ error: "Data e hora são obrigatórias" });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO events
+        (title, date, time, end_time, description, category, user_id)
+      VALUES
+        ($1,    $2,   $3,   $4,       $5,          $6,       $7)
+      RETURNING
+        id::text AS id,
+        title,
+        date,
+        time,
+        end_time AS "endTime",
+        description,
+        category
+      `,
+      [title.trim(), date, time, endTime, description, category, req.userId]
+    );
+
+    return res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Erro no POST /events:", error);
+    return res.status(500).json({ error: "Erro ao criar evento" });
+  }
+});
+
+app.patch("/events/:id", auth, async (req, res) => {
+  try {
+    const current = await pool.query(
+      `
+      SELECT *
+      FROM events
+      WHERE id = $1 AND user_id = $2
+      `,
+      [req.params.id, req.userId]
+    );
+
+    const event = current.rows[0];
+
+    if (!event) {
+      return res.status(404).json({ error: "Evento não encontrado" });
+    }
+
+    const nextTitle = req.body.title ?? event.title;
+    const nextDate = req.body.date ?? event.date;
+    const nextTime = req.body.time ?? event.time;
+    const nextEndTime = req.body.endTime ?? event.end_time;
+    const nextDescription = req.body.description ?? event.description;
+    const nextCategory = req.body.category ?? event.category;
+
+    const result = await pool.query(
+      `
+      UPDATE events
+      SET
+        title = $1,
+        date = $2,
+        time = $3,
+        end_time = $4,
+        description = $5,
+        category = $6
+      WHERE id = $7 AND user_id = $8
+      RETURNING
+        id::text AS id,
+        title,
+        date,
+        time,
+        end_time AS "endTime",
+        description,
+        category
+      `,
+      [
+        nextTitle,
+        nextDate,
+        nextTime,
+        nextEndTime,
+        nextDescription,
+        nextCategory,
+        req.params.id,
+        req.userId,
+      ]
+    );
+
+    return res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Erro no PATCH /events:", error);
+    return res.status(500).json({ error: "Erro ao atualizar evento" });
+  }
+});
+
+app.delete("/events/:id", auth, async (req, res) => {
+  try {
+    await pool.query(
+      "DELETE FROM events WHERE id = $1 AND user_id = $2",
+      [req.params.id, req.userId]
+    );
+
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error("Erro no DELETE /events:", error);
+    return res.status(500).json({ error: "Erro ao deletar evento" });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 
 initDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`API rodando na porta ${PORT}`);
+      console.log(API rodando na porta ${PORT});
     });
   })
   .catch((error) => {
