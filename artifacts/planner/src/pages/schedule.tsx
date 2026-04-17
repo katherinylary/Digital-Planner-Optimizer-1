@@ -137,6 +137,13 @@ export default function Schedule() {
                   </SelectContent>
                 </Select>
                 <Textarea placeholder="Descrição (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} data-testid="input-event-description" />
+                <Input
+  placeholder="Emails dos convidados (separados por vírgula)"
+  value={form.participants}
+  onChange={(e) =>
+    setForm({ ...form, participants: e.target.value })
+  }
+/>
                 <Button onClick={handleAdd} className="w-full" data-testid="button-save-event">Salvar</Button>
               </div>
             </DialogContent>
