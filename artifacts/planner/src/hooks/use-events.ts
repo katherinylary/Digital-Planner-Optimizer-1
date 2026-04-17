@@ -11,6 +11,10 @@ export interface Event {
   endTime?: string;
   description?: string;
   category: string;
+
+  participantEmails?: string[]; // 👈 novo
+  isOwner?: boolean;            // 👈 novo
+  ownerEmail?: string;          // 👈 opcional
 }
 
 function getToken() {
@@ -57,20 +61,26 @@ export function useEvents() {
     loadEvents();
   }, [loadEvents]);
 
-  const addEvent = useCallback(async (event: Omit<Event, "id">) => {
-    const token = getToken();
-    if (!token) {
-      throw new Error("Usuário não autenticado");
-    }
+  const addEvent = async (event: Omit<Event, "id">) => {
+  const token = localStorage.getItem("planner_auth_token");
 
-    const res = await fetch(`${API_URL}/events`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
-      },
-      body: JSON.stringify(event),
-    });
+  const res = await fetch(`${API_URL}/events`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token || "",
+    },
+    body: JSON.stringify(event),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Erro ao criar evento");
+  }
+
+  setEvents((prev) => [data, ...prev]);
+};
 
     const data = await res.json();
 
