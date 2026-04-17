@@ -84,13 +84,13 @@ async function initDB() {
   `);
 
   await pool.query(`
-  CREATE TABLE IF NOT EXISTS event_participants (
-  id SERIAL PRIMARY KEY,
-  event_id INTEGER REFERENCES events(id) ON DELETE CASCADE,
-  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
+    CREATE TABLE IF NOT EXISTS event_participants (
+      id SERIAL PRIMARY KEY,
+      event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      UNIQUE(event_id, user_id)
     );
   `);
-);
 }
 
 function auth(req, res, next) {
@@ -529,7 +529,7 @@ app.patch("/events/:id", auth, async (req, res) => {
 
     if (participantEmails) {
       await pool.query(
-        `DELETE FROM event_participants WHERE event_id = $1`,
+        DELETE FROM event_participants WHERE event_id = $1,
         [req.params.id]
       );
 
@@ -595,7 +595,7 @@ const PORT = process.env.PORT || 3000;
 initDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`API rodando na porta ${PORT}`);
+      console.log(API rodando na porta ${PORT});
     });
   })
   .catch((error) => {
