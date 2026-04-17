@@ -531,7 +531,7 @@ export default function Schedule() {
                 <div key={d} className="py-1 font-medium">
                   {d}
                 </div>
-              ))}
+          })}
             </div>
 
             <div className="grid grid-cols-7 gap-1">
