@@ -36,6 +36,33 @@ async function initDB() {
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
     );
   `);
+
+  await pool.query(`
+    ALTER TABLE tasks
+    ADD COLUMN IF NOT EXISTS title TEXT,
+    ADD COLUMN IF NOT EXISTS description TEXT,
+    ADD COLUMN IF NOT EXISTS date TEXT,
+    ADD COLUMN IF NOT EXISTS time TEXT,
+    ADD COLUMN IF NOT EXISTS priority TEXT DEFAULT 'medium',
+    ADD COLUMN IF NOT EXISTS category TEXT DEFAULT 'Autocuidado',
+    ADD COLUMN IF NOT EXISTS completed BOOLEAN DEFAULT false,
+    ADD COLUMN IF NOT EXISTS created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000;
+  `);
+
+  await pool.query(`
+    UPDATE tasks
+    SET
+      title = COALESCE(title, text),
+      completed = COALESCE(completed, false),
+      priority = COALESCE(priority, 'medium'),
+      category = COALESCE(category, 'Autocuidado'),
+      created_at = COALESCE(created_at, EXTRACT(EPOCH FROM NOW()) * 1000)
+    WHERE title IS NULL
+       OR completed IS NULL
+       OR priority IS NULL
+       OR category IS NULL
+       OR created_at IS NULL;
+  `);
 }
 
 function auth(req, res, next) {
@@ -126,7 +153,21 @@ app.post("/login", async (req, res) => {
 app.get("/tasks", auth, async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, text FROM tasks WHERE user_id = $1 ORDER BY id DESC",
+      `
+      SELECT
+        id::text AS id,
+        COALESCE(title, text) AS title,
+        description,
+        date,
+        time,
+        priority,
+        category,
+        completed,
+        created_at AS "createdAt"
+      FROM tasks
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      `,
       [req.userId]
     );
 
@@ -139,21 +180,128 @@ app.get("/tasks", auth, async (req, res) => {
 
 app.post("/tasks", auth, async (req, res) => {
   try {
-    const { text } = req.body;
+    const {
+      title,
+      description = "",
+      date = null,
+      time = null,
+      priority = "medium",
+      category = "Autocuidado",
+      completed = false,
+      createdAt = Date.now(),
+    } = req.body;
 
-    if (!text || !text.trim()) {
-      return res.status(400).json({ error: "Texto da tarefa é obrigatório" });
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: "Título da tarefa é obrigatório" });
     }
 
     const result = await pool.query(
-      "INSERT INTO tasks (text, user_id) VALUES ($1, $2) RETURNING id, text",
-      [text.trim(), req.userId]
+      `
+      INSERT INTO tasks
+        (text, title, description, date, time, priority, category, completed, created_at, user_id)
+      VALUES
+        ($1,   $2,    $3,          $4,   $5,   $6,       $7,       $8,        $9,         $10)
+      RETURNING
+        id::text AS id,
+        title,
+        description,
+        date,
+        time,
+        priority,
+        category,
+        completed,
+        created_at AS "createdAt"
+      `,
+      [
+        title.trim(),
+        title.trim(),
+        description,
+        date,
+        time,
+        priority,
+        category,
+        completed,
+        createdAt,
+        req.userId,
+      ]
     );
 
     return res.json(result.rows[0]);
   } catch (error) {
     console.error("Erro no POST /tasks:", error);
     return res.status(500).json({ error: "Erro ao criar tarefa" });
+  }
+});
+
+app.patch("/tasks/:id", auth, async (req, res) => {
+  try {
+    const { title, description, date, time, priority, category, completed } = req.body;
+
+    const current = await pool.query(
+      `
+      SELECT *
+      FROM tasks
+      WHERE id = $1 AND user_id = $2
+      `,
+      [req.params.id, req.userId]
+    );
+
+    const task = current.rows[0];
+
+    if (!task) {
+      return res.status(404).json({ error: "Tarefa não encontrada" });
+    }
+
+    const nextTitle = title ?? task.title ?? task.text;
+    const nextDescription = description ?? task.description;
+    const nextDate = date ?? task.date;
+    const nextTime = time ?? task.time;
+    const nextPriority = priority ?? task.priority;
+    const nextCategory = category ?? task.category;
+    const nextCompleted = completed ?? task.completed;
+
+    const result = await pool.query(
+      `
+      UPDATE tasks
+      SET
+        text = $1,
+        title = $2,
+        description = $3,
+        date = $4,
+        time = $5,
+        priority = $6,
+        category = $7,
+        completed = $8
+      WHERE id = $9 AND user_id = $10
+      RETURNING
+        id::text AS id,
+        title,
+        description,
+        date,
+        time,
+        priority,
+        category,
+        completed,
+        created_at AS "createdAt"
+      `,
+      [
+        nextTitle,
+        nextTitle,
+        nextDescription,
+        nextDate,
+        nextTime,
+        nextPriority,
+        nextCategory,
+        nextCompleted,
+        req.params.id,
+        req.userId,
+      ]
+    );
+
+    return res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Erro no PATCH /tasks:", error);
+    return res.status(500).json({ error: "Erro ao atualizar tarefa" });
   }
 });
 
@@ -176,7 +324,7 @@ const PORT = process.env.PORT || 3000;
 initDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`API rodando na porta ${PORT}`);
+      console.log(API rodando na porta ${PORT});
     });
   })
   .catch((error) => {
