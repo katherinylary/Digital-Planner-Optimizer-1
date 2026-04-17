@@ -65,7 +65,7 @@ export function useAuth() {
 
     setStoredUsername(username);
     setIsAuthenticated(true);
-    setIsSetup(true);
+    setIsSetup(false);
   }, []);
 
   const login = useCallback(async (username: string, password: string): Promise<boolean> => {
@@ -92,7 +92,7 @@ export function useAuth() {
 
       setStoredUsername(username);
       setIsAuthenticated(true);
-      setIsSetup(true);
+      setIsSetup(false);
 
       return true;
     } catch (error) {
