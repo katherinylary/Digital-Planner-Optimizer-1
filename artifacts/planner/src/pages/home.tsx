@@ -1,3 +1,4 @@
+import { useTheme } from "@/hooks/use-theme";
 import { format, addDays, isToday, isTomorrow, parseISO, getDayOfYear } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
@@ -119,6 +120,7 @@ function WaterDroplet({ index, liters, onSet }: { index: number; liters: number;
 }
 
 export default function Home() {
+  const { theme } = useTheme();
   const today = format(new Date(), "yyyy-MM-dd");
   const displayDate = format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR });
 
@@ -165,7 +167,9 @@ export default function Home() {
       {/* Header */}
       <div>
         <h1 className="text-3xl md:text-4xl font-serif italic text-primary flex items-center gap-2">
-          Olá, linda! <Sparkles className="h-6 w-6 text-yellow-400" />
+  {theme === "masculino" ? "Olá!" : "Olá, linda!"}
+  <Sparkles className="h-6 w-6 text-yellow-400" />
+</h1>
         </h1>
         <p className="text-muted-foreground capitalize mt-1">{displayDate}</p>
       </div>
