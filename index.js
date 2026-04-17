@@ -46,7 +46,10 @@ async function initDB() {
     ADD COLUMN IF NOT EXISTS priority TEXT DEFAULT 'medium',
     ADD COLUMN IF NOT EXISTS category TEXT DEFAULT 'Autocuidado',
     ADD COLUMN IF NOT EXISTS completed BOOLEAN DEFAULT false,
-    ADD COLUMN IF NOT EXISTS created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000;
+    ADD COLUMN IF NOT EXISTS created_at BIGINT;
+    UPDATE tasks
+SET created_at = EXTRACT(EPOCH FROM NOW()) * 1000
+WHERE created_at IS NULL;
   `);
 
   await pool.query(`
