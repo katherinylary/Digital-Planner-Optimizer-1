@@ -448,97 +448,96 @@ export default function Schedule() {
                               </div>
 
                               {ev.description && (
-                                <p className="text-xs opacity-60 truncate mt-0.5">{ev.description}</p>
-                              )}
+  <p className="text-xs opacity-60 truncate mt-0.5">{ev.description}</p>
+)}
 
-                              {!ev.isOwner && ev.ownerEmail && (
-                                <p className="text-[11px] opacity-70 mt-1">
-                                  Criado por: {ev.ownerEmail}
-                                </p>
-                              )}
-                            </div>
+{!ev.isOwner && ev.ownerEmail && (
+  <p className="text-[11px] opacity-70 mt-1">
+    Criado por: {ev.ownerEmail}
+  </p>
+)}
+</div>
 
-                            {ev.isOwner && (
-                              <div className="flex items-center gap-1 ml-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                  onClick={() => openEdit(ev)}
-                                  className="text-primary/70 hover:text-primary transition-colors p-1"
-                                  title="Editar"
-                                  data-testid={`button-edit-event-${ev.id}`}
-                                >
-                                  <Pencil className="h-3.5 w-3.5" />
-                                </button>
+{ev.isOwner && (
+  <div className="flex items-center gap-1 ml-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+    <button
+      onClick={() => openEdit(ev)}
+      className="text-primary/70 hover:text-primary transition-colors p-1"
+      title="Editar"
+      data-testid={`button-edit-event-${ev.id}`}
+    >
+      <Pencil className="h-3.5 w-3.5" />
+    </button>
 
-                                <button
-                                  onClick={() => openPostpone(ev)}
-                                  className="text-primary/70 hover:text-primary transition-colors p-1"
-                                  title="Adiar"
-                                  data-testid={`button-postpone-event-${ev.id}`}
-                                >
-                                  <CalendarClock className="h-3.5 w-3.5" />
-                                </button>
+    <button
+      onClick={() => openPostpone(ev)}
+      className="text-primary/70 hover:text-primary transition-colors p-1"
+      title="Adiar"
+      data-testid={`button-postpone-event-${ev.id}`}
+    >
+      <CalendarClock className="h-3.5 w-3.5" />
+    </button>
 
-                                <button
-                                  onClick={() => deleteEvent(ev.id)}
-                                  className="text-destructive/70 hover:text-destructive transition-colors p-1"
-                                  data-testid={`button-delete-event-${ev.id}`}
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+    <button
+      onClick={() => deleteEvent(ev.id)}
+      className="text-destructive/70 hover:text-destructive transition-colors p-1"
+      data-testid={`button-delete-event-${ev.id}`}
+    >
+      <Trash2 className="h-3.5 w-3.5" />
+    </button>
+  </div>
+)}
+</div>
+))}
+</div>
+</div>
+);
+})}
+</div>
+</CardContent>
+</Card>
+</div>
+) : (
+<Card>
+  <CardHeader className="pb-2">
+    <div className="flex items-center justify-between">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+        data-testid="button-prev-month"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </Button>
+
+      <CardTitle className="text-lg capitalize">
+        {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
+      </CardTitle>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+        data-testid="button-next-month"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </Button>
+    </div>
+  </CardHeader>
+
+  <CardContent>
+    <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground mb-2">
+      {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d) => (
+        <div key={d} className="py-1 font-medium">
+          {d}
         </div>
-      ) : (
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                data-testid="button-prev-month"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
+      ))}
+    </div>
 
-              <CardTitle className="text-lg capitalize">
-                {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
-              </CardTitle>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                data-testid="button-next-month"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardHeader>
-
-          <CardContent>
-            <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground mb-2">
-              {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d) => (
-                <div key={d} className="py-1 font-medium">
-                  {d}
-                </div>
-          })}
-            </div>
-
-            <div className="grid grid-cols-7 gap-1">
-              {Array.from({ length: startDay }).map((_, i) => (
-                <div key={empty-${i}} />
-          })}
-
+    <div className="grid grid-cols-7 gap-1">
+      {Array.from({ length: startDay }).map((_, i) => (
+        <div key={`empty-${i}`} />
+      ))}
               {monthDays.map((day) => {
                 const ds = format(day, "yyyy-MM-dd");
                 const count = events.filter((e) => e.date === ds).length;
