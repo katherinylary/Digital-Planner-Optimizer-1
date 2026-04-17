@@ -1,64 +1,140 @@
 import { useEffect, useState } from "react";
 
+const API = "https://digital-planner-optimizer-1-4.onrender.com";
+
 type Task = {
   id: number;
   text: string;
 };
 
 export default function App() {
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("token")
+  );
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const [tasks, setTasks] = useState<Task[]>([]);
   const [text, setText] = useState("");
 
-  const API = "https://digital-planner-optimizer-1-4.onrender.com";
+  // ================= LOGIN =================
+
+  async function register() {
+    await fetch(`${API}/register`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ email, password }),
+    });
+    alert("Usuário criado!");
+  }
+
+  async function login() {
+    const res = await fetch(`${API}/login`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      setToken(data.token);
+    } else {
+      alert("Erro no login");
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem("token");
+    setToken(null);
+    setTasks([]);
+  }
+
+  // ================= TASKS =================
 
   async function loadTasks() {
-    try {
-      const res = await fetch(`${API}/tasks`);
-      const data = await res.json();
-      setTasks(data);
-    } catch (err) {
-      console.log("Erro ao carregar tarefas", err);
-    }
+    const res = await fetch(`${API}/tasks`, {
+      headers: { Authorization: token! },
+    });
+    const data = await res.json();
+    setTasks(data);
   }
 
   async function addTask() {
     if (!text.trim()) return;
 
-    try {
-      const res = await fetch(`${API}/tasks`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
+    const res = await fetch(`${API}/tasks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token!,
+      },
+      body: JSON.stringify({ text }),
+    });
 
-      const newTask = await res.json();
-      setTasks((prev) => [...prev, newTask]);
-      setText("");
-    } catch (err) {
-      console.log("Erro ao adicionar tarefa", err);
-    }
+    const newTask = await res.json();
+    setTasks((prev) => [...prev, newTask]);
+    setText("");
   }
 
   async function deleteTask(id: number) {
-    try {
-      await fetch(`${API}/tasks/${id}`, {
-        method: "DELETE",
-      });
+    await fetch(`${API}/tasks/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: token! },
+    });
 
-      setTasks((prev) => prev.filter((t) => t.id !== id));
-    } catch (err) {
-      console.log("Erro ao deletar tarefa", err);
-    }
+    setTasks((prev) => prev.filter((t) => t.id !== id));
   }
 
   useEffect(() => {
-    loadTasks();
-  }, []);
+    if (token) loadTasks();
+  }, [token]);
+
+  // ================= UI =================
+
+  if (!token) {
+    return (
+      <div style={styles.page}>
+        <div style={styles.card}>
+          <h2>Login / Cadastro</h2>
+
+          <input
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={styles.input}
+          />
+
+          <input
+            placeholder="Senha"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={styles.input}
+          />
+
+          <button onClick={login} style={styles.button}>
+            Entrar
+          </button>
+
+          <button onClick={register} style={styles.buttonSecondary}>
+            Criar conta
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h1 style={styles.title}>🧠 Meu Planejador</h1>
+        <h1>🧠 Meu Planejador</h1>
+
+        <button onClick={logout} style={styles.logout}>
+          Sair
+        </button>
 
         <div style={styles.row}>
           <input
@@ -68,20 +144,15 @@ export default function App() {
             style={styles.input}
           />
           <button onClick={addTask} style={styles.button}>
-            Adicionar
+            +
           </button>
         </div>
 
-        <div style={styles.list}>
+        <div>
           {tasks.map((task) => (
             <div key={task.id} style={styles.task}>
               <span>{task.text}</span>
-              <button
-                onClick={() => deleteTask(task.id)}
-                style={styles.delete}
-              >
-                ✕
-              </button>
+              <button onClick={() => deleteTask(task.id)}>❌</button>
             </div>
           ))}
         </div>
@@ -89,6 +160,8 @@ export default function App() {
     </div>
   );
 }
+
+// ================= ESTILO =================
 
 const styles: any = {
   page: {
@@ -100,40 +173,48 @@ const styles: any = {
     fontFamily: "system-ui",
   },
   card: {
-    width: "100%",
-    maxWidth: 420,
+    width: 350,
     background: "#fff",
     padding: 20,
-    borderRadius: 16,
+    borderRadius: 12,
     boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
   },
-  title: {
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  row: {
-    display: "flex",
-    gap: 10,
-    marginBottom: 20,
-  },
   input: {
-    flex: 1,
+    width: "100%",
     padding: 10,
+    marginBottom: 10,
     borderRadius: 8,
     border: "1px solid #ddd",
   },
   button: {
-    padding: "10px 14px",
-    borderRadius: 8,
-    border: "none",
+    width: "100%",
+    padding: 10,
     background: "#4f46e5",
     color: "#fff",
+    border: "none",
+    borderRadius: 8,
+    marginBottom: 10,
     cursor: "pointer",
   },
-  list: {
+  buttonSecondary: {
+    width: "100%",
+    padding: 10,
+    background: "#e5e7eb",
+    border: "none",
+    borderRadius: 8,
+    cursor: "pointer",
+  },
+  logout: {
+    background: "transparent",
+    border: "none",
+    color: "red",
+    float: "right",
+    cursor: "pointer",
+  },
+  row: {
     display: "flex",
-    flexDirection: "column",
     gap: 10,
+    marginBottom: 15,
   },
   task: {
     display: "flex",
@@ -141,11 +222,6 @@ const styles: any = {
     padding: 10,
     background: "#f8fafc",
     borderRadius: 8,
-  },
-  delete: {
-    background: "transparent",
-    border: "none",
-    color: "red",
-    cursor: "pointer",
+    marginBottom: 8,
   },
 };
