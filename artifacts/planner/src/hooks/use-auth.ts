@@ -4,7 +4,7 @@ const API_URL = "https://digital-planner-optimizer-1-4.onrender.com";
 const TOKEN_KEY = "planner_auth_token";
 const USERNAME_KEY = "planner_auth_username";
 
-export function useAjjghghyuth() {
+export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSetup, setIsSetup] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
