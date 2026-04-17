@@ -152,7 +152,7 @@ export function useTasks() {
       throw new Error("Usuário não autenticado");
     }
 
-    const res = await fetch(${API_URL}/tasks/${id}, {
+    const res = await fetch(`${API_URL}/tasks/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: token,
