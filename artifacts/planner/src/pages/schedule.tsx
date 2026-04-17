@@ -429,7 +429,7 @@ export default function Schedule() {
                           <div
                             key={ev.id}
                             className="flex items-center justify-between bg-primary/10 text-primary px-3 py-2 rounded-lg text-sm group"
-                            data-testid={event-${ev.id}}
+                            data-testid={`event-${ev.id}`}
                           >
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2 flex-wrap">
@@ -558,7 +558,7 @@ export default function Schedule() {
                       isSelected && "bg-primary text-primary-foreground",
                       !isSelected && "hover:bg-muted"
                     )}
-                    data-testid={calendar-day-${ds}}
+                    data-testid={`calendar-day-${ds}`}
                   >
                     {format(day, "d")}
                     {count > 0 && (
