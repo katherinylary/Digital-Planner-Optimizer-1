@@ -84,12 +84,7 @@ async function initDB() {
   `);
 
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS event_participants (
-      id SERIAL PRIMARY KEY,
-      event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      UNIQUE(event_id, user_id)
-      CREATE TABLE IF NOT EXISTS event_participants (
+  CREATE TABLE IF NOT EXISTS event_participants (
   id SERIAL PRIMARY KEY,
   event_id INTEGER REFERENCES events(id) ON DELETE CASCADE,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
