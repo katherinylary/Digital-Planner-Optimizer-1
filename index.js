@@ -82,6 +82,15 @@ async function initDB() {
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
     );
   `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS event_participants (
+      id SERIAL PRIMARY KEY,
+      event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      UNIQUE(event_id, user_id)
+    );
+  `);
 }
 
 function auth(req, res, next) {
