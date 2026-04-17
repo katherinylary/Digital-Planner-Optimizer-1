@@ -11,11 +11,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Droplet, Plus, Target, CheckCircle2, Sparkles, NotebookPen, CalendarDays, Clock, Quote } from "lucide-react";
+import {
+  Droplet,
+  Plus,
+  Target,
+  CheckCircle2,
+  Sparkles,
+  NotebookPen,
+  CalendarDays,
+  Clock,
+  Quote,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "wouter";
 
-const MOODS = ["😊", "😢", "😡", "😴", "🥰", "😎", "🤩", "😤", "😌", "🥺", "😭", "😋", "🤔", "💪", "🌸", "✨", "🦋", "💖", "🔥", "⭐", "🌈", "☀️", "🌙"];
+const MOODS = [
+  "😊", "😢", "😡", "😴", "🥰", "😎", "🤩", "😤", "😌", "🥺", "😭",
+  "😋", "🤔", "💪", "🌸", "✨", "🦋", "💖", "🔥", "⭐", "🌈", "☀️", "🌙",
+];
 
 const CATEGORY_COLORS: Record<string, string> = {
   Pessoal: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300",
@@ -63,17 +76,19 @@ function getDailyQuote() {
   return QUOTES[dayOfYear % QUOTES.length];
 }
 
-function WaterDroplet({ index, liters, onSet }: { index: number; liters: number; onSet: (v: number) => void }) {
+function WaterDroplet({
+  index,
+  liters,
+  onSet,
+}: {
+  index: number;
+  liters: number;
+  onSet: (v: number) => void;
+}) {
   const halfVal = index - 0.5;
   const fullVal = index;
   const isFull = liters >= fullVal;
   const isHalf = liters >= halfVal && liters < fullVal;
-
-  const handleClick = () => {
-    if (isFull) onSet(halfVal);
-    else if (isHalf) onSet(halfVal - 0.5 < 0 ? 0 : halfVal - 0.5);
-    else onSet(fullVal);
-  };
 
   const handleHalfClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -88,32 +103,40 @@ function WaterDroplet({ index, liters, onSet }: { index: number; liters: number;
   };
 
   return (
-    <div className="flex flex-col items-center gap-1" title={`${index - 0.5}L / ${index}L`}>
+    <div className="flex flex-col items-center gap-1" title={${index - 0.5}L / ${index}L}>
       <div className="relative w-10 h-14 cursor-pointer select-none">
         <div className="absolute inset-0 overflow-hidden rounded-b-full rounded-t-[60%]">
-          <div className={cn("absolute inset-0 transition-colors duration-200", isFull ? "bg-blue-400" : isHalf ? "bg-blue-300" : "bg-muted/50")} />
+          <div
+            className={cn(
+              "absolute inset-0 transition-colors duration-200",
+              isFull ? "bg-blue-400" : isHalf ? "bg-blue-300" : "bg-muted/50"
+            )}
+          />
           {!isFull && !isHalf && (
             <div className="absolute inset-0 border-2 border-blue-200/50 rounded-b-full rounded-t-[60%]" />
           )}
         </div>
+
         <div className="absolute inset-0 flex flex-col">
           <button
             onClick={handleFullClick}
             className="flex-1 w-full rounded-t-[60%]"
-            title={isFull ? `Reduzir para ${halfVal}L` : `Completar ${index}L`}
+            title={isFull ? Reduzir para ${halfVal}L : Completar ${index}L}
           />
           <button
             onClick={handleHalfClick}
             className="flex-1 w-full rounded-b-full"
-            title={isHalf ? `Remover ${halfVal}L` : `Adicionar ${halfVal}L`}
+            title={isHalf ? Remover ${halfVal}L : Adicionar ${halfVal}L}
           />
         </div>
+
         {(isFull || isHalf) && (
           <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold pointer-events-none select-none">
             <Droplet className="h-4 w-4 fill-white/80 text-white/80" />
           </div>
         )}
       </div>
+
       <span className="text-[10px] text-muted-foreground font-medium">{index}L</span>
     </div>
   );
@@ -201,28 +224,29 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-               {todayGoals.map((goal) => (
-  <div
-    key={goal.id}
-    className="flex items-center gap-3 bg-background/50 p-3 rounded-lg border border-border/50"
-  >
-    <Checkbox
-      id={`goal-${goal.id}`}
-      checked={goal.completed}
-      onCheckedChange={() => toggleGoal(goal.id)}
-      className="rounded-full data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-    />
-    <label
-      htmlFor={`goal-${goal.id}`}
-      className={cn(
-        "flex-1 cursor-pointer transition-all",
-        goal.completed && "text-muted-foreground line-through"
-      )}
-    >
-      {goal.title}
-    </label>
-  </div>
-))}
+                {todayGoals.map((goal) => (
+                  <div
+                    key={goal.id}
+                    className="flex items-center gap-3 bg-background/50 p-3 rounded-lg border border-border/50"
+                  >
+                    <Checkbox
+                      id={goal-${goal.id}}
+                      checked={goal.completed}
+                      onCheckedChange={() => toggleGoal(goal.id)}
+                      className="rounded-full data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                    />
+                    <label
+                      htmlFor={goal-${goal.id}}
+                      className={cn(
+                        "flex-1 cursor-pointer transition-all",
+                        goal.completed && "text-muted-foreground line-through"
+                      )}
+                    >
+                      {goal.title}
+                    </label>
+                  </div>
+                ))}
+
                 <form onSubmit={handleAddGoal} className="flex gap-2">
                   <Input
                     placeholder="Adicionar uma intenção..."
