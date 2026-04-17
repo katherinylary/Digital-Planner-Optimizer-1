@@ -6,7 +6,7 @@ const USERNAME_KEY = "planner_auth_username";
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isSetup, setIsSetup] = useState(true);
+  const [isSetup, setIsSetup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [storedUsername, setStoredUsername] = useState("");
 
