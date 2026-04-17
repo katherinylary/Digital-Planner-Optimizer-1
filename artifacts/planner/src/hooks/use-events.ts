@@ -31,7 +31,7 @@ export function useEvents() {
     }
 
     try {
-      const res = await fetch(${API_URL}/events, {
+      const res = await fetch(`${API_URL}/events`, {
         headers: {
           Authorization: token,
         },
@@ -63,7 +63,7 @@ export function useEvents() {
       throw new Error("Usuário não autenticado");
     }
 
-    const res = await fetch(${API_URL}/events, {
+    const res = await fetch(`${API_URL}/events`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export function useEvents() {
       throw new Error("Usuário não autenticado");
     }
 
-    const res = await fetch(${API_URL}/events/${id}, {
+    const res = await fetch(`${API_URL}/events/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -123,7 +123,7 @@ export function useEvents() {
       throw new Error("Usuário não autenticado");
     }
 
-    const res = await fetch(${API_URL}/events/${id}, {
+    const res = await fetch(`${API_URL}/events/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: token,
