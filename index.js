@@ -2,98 +2,184 @@ import express from "express";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import pkg from "pg";
+
+const { Pool } = pkg;
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const SECRET = "segredo_super_secreto";
+const SECRET = process.env.JWT_SECRET || "segredo_super_secreto";
 
-// ===== BANCO SIMPLES (memória) =====
-let users = [];
-let tasks = [];
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
 
-// ===== MIDDLEWARE =====
+async function initDB() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL
+    );
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS tasks (
+      id SERIAL PRIMARY KEY,
+      text TEXT NOT NULL,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+}
+
 function auth(req, res, next) {
   const token = req.headers.authorization;
 
-  if (!token) return res.status(401).json({ error: "Sem token" });
+  if (!token) {
+    return res.status(401).json({ error: "Sem token" });
+  }
 
   try {
     const decoded = jwt.verify(token, SECRET);
     req.userId = decoded.id;
     next();
   } catch {
-    res.status(401).json({ error: "Token inválido" });
+    return res.status(401).json({ error: "Token inválido" });
   }
 }
 
-// ===== AUTH =====
+app.get("/", async (req, res) => {
+  res.json({ ok: true, message: "API online" });
+});
 
 app.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const userExists = users.find(u => u.email === email);
-  if (userExists) return res.status(400).json({ error: "Usuário já existe" });
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email e senha são obrigatórios" });
+    }
 
-  const hash = await bcrypt.hash(password, 10);
+    const exists = await pool.query(
+      "SELECT id FROM users WHERE email = $1",
+      [email]
+    );
 
-  const user = {
-    id: Date.now(),
-    email,
-    password: hash
-  };
+    if (exists.rows.length > 0) {
+      return res.status(400).json({ error: "Usuário já existe" });
+    }
 
-  users.push(user);
+    const hash = await bcrypt.hash(password, 10);
 
-  res.json({ ok: true });
+    await pool.query(
+      "INSERT INTO users (email, password) VALUES ($1, $2)",
+      [email, hash]
+    );
+
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error("Erro no /register:", error);
+    return res.status(500).json({ error: "Erro ao criar usuário" });
+  }
 });
 
 app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = users.find(u => u.email === email);
-  if (!user) return res.status(400).json({ error: "Usuário não encontrado" });
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email e senha são obrigatórios" });
+    }
 
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(400).json({ error: "Senha inválida" });
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
 
-  const token = jwt.sign({ id: user.id }, SECRET);
+    const user = result.rows[0];
 
-  res.json({ token });
+    if (!user) {
+      return res.status(400).json({ error: "Usuário não encontrado" });
+    }
+
+    const valid = await bcrypt.compare(password, user.password);
+
+    if (!valid) {
+      return res.status(400).json({ error: "Senha inválida" });
+    }
+
+    const token = jwt.sign({ id: user.id }, SECRET, { expiresIn: "7d" });
+
+    return res.json({ token });
+  } catch (error) {
+    console.error("Erro no /login:", error);
+    return res.status(500).json({ error: "Erro ao fazer login" });
+  }
 });
 
-// ===== TASKS =====
+app.get("/tasks", auth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, text FROM tasks WHERE user_id = $1 ORDER BY id DESC",
+      [req.userId]
+    );
 
-app.get("/tasks", auth, (req, res) => {
-  const userTasks = tasks.filter(t => t.userId === req.userId);
-  res.json(userTasks);
+    return res.json(result.rows);
+  } catch (error) {
+    console.error("Erro no GET /tasks:", error);
+    return res.status(500).json({ error: "Erro ao buscar tarefas" });
+  }
 });
 
-app.post("/tasks", auth, (req, res) => {
-  const task = {
-    id: Date.now(),
-    text: req.body.text,
-    userId: req.userId
-  };
+app.post("/tasks", auth, async (req, res) => {
+  try {
+    const { text } = req.body;
 
-  tasks.push(task);
-  res.json(task);
+    if (!text || !text.trim()) {
+      return res.status(400).json({ error: "Texto da tarefa é obrigatório" });
+    }
+
+    const result = await pool.query(
+      "INSERT INTO tasks (text, user_id) VALUES ($1, $2) RETURNING id, text",
+      [text.trim(), req.userId]
+    );
+
+    return res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Erro no POST /tasks:", error);
+    return res.status(500).json({ error: "Erro ao criar tarefa" });
+  }
 });
 
-app.delete("/tasks/:id", auth, (req, res) => {
-  tasks = tasks.filter(
-    t => t.id != req.params.id || t.userId !== req.userId
-  );
+app.delete("/tasks/:id", auth, async (req, res) => {
+  try {
+    await pool.query(
+      "DELETE FROM tasks WHERE id = $1 AND user_id = $2",
+      [req.params.id, req.userId]
+    );
 
-  res.json({ ok: true });
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error("Erro no DELETE /tasks:", error);
+    return res.status(500).json({ error: "Erro ao deletar tarefa" });
+  }
 });
-
-// ===== START =====
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log("API rodando com login 🚀");
-});
+initDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`API rodando na porta ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Erro ao iniciar banco:", error);
+    process.exit(1);
+  });
