@@ -270,10 +270,31 @@ const handleAdd = () => {
                         {hourEvents.map((ev) => (
                           <div key={ev.id} className="flex items-center justify-between bg-primary/10 text-primary px-3 py-2 rounded-lg text-sm group" data-testid={`event-${ev.id}`}>
                             <div className="min-w-0 flex-1">
-                              <span className="font-medium">{ev.title}</span>
-                              <span className="ml-2 text-xs opacity-70">{ev.time}{ev.endTime ? ` - ${ev.endTime}` : ""}</span>
-                              {ev.description && <p className="text-xs opacity-60 truncate mt-0.5">{ev.description}</p>}
-                            </div>
+  <div className="flex items-center gap-2 flex-wrap">
+    <span className="font-medium">{ev.title}</span>
+
+    {!ev.isOwner && (
+      <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/15 text-primary font-medium">
+        Compartilhado
+      </span>
+    )}
+
+    <span className="text-xs opacity-70">
+      {ev.time}
+      {ev.endTime ? ` - ${ev.endTime}` : ""}
+    </span>
+  </div>
+
+  {ev.description && (
+    <p className="text-xs opacity-60 truncate mt-0.5">{ev.description}</p>
+  )}
+
+  {!ev.isOwner && ev.ownerEmail && (
+    <p className="text-[11px] opacity-70 mt-1">
+      Criado por: {ev.ownerEmail}
+    </p>
+  )}
+</div>
                             <div className="flex items-center gap-1 ml-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button onClick={() => openEdit(ev)} className="text-primary/70 hover:text-primary transition-colors p-1" title="Editar" data-testid={`button-edit-event-${ev.id}`}>
                                 <Pencil className="h-3.5 w-3.5" />
