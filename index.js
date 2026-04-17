@@ -390,6 +390,7 @@ app.post("/events", auth, async (req, res) => {
       endTime = null,
       description = "",
       category = "Pessoal",
+      participantEmails = [],
     } = req.body;
 
     if (!title || !title.trim()) {
@@ -400,25 +401,66 @@ app.post("/events", auth, async (req, res) => {
       return res.status(400).json({ error: "Data e hora são obrigatórias" });
     }
 
-    const result = await pool.query(
+    const inserted = await pool.query(
       `
       INSERT INTO events
         (title, date, time, end_time, description, category, user_id)
       VALUES
         ($1,    $2,   $3,   $4,       $5,          $6,       $7)
       RETURNING
-        id::text AS id,
+        id,
         title,
         date,
         time,
         end_time AS "endTime",
         description,
-        category
+        category,
+        user_id::text AS "ownerId"
       `,
       [title.trim(), date, time, endTime, description, category, req.userId]
     );
 
-    return res.json(result.rows[0]);
+    const event = inserted.rows[0];
+
+    if (Array.isArray(participantEmails) && participantEmails.length > 0) {
+      const cleanEmails = [
+        ...new Set(
+          participantEmails
+            .map((email) => String(email).trim().toLowerCase())
+            .filter(Boolean)
+        ),
+      ];
+
+      if (cleanEmails.length > 0) {
+        const usersResult = await pool.query(
+          `
+          SELECT id, email
+          FROM users
+          WHERE LOWER(email) = ANY($1)
+          `,
+          [cleanEmails]
+        );
+
+        for (const user of usersResult.rows) {
+          if (user.id !== req.userId) {
+            await pool.query(
+              `
+              INSERT INTO event_participants (event_id, user_id)
+              VALUES ($1, $2)
+              ON CONFLICT (event_id, user_id) DO NOTHING
+              `,
+              [event.id, user.id]
+            );
+          }
+        }
+      }
+    }
+
+    return res.json({
+      ...event,
+      id: String(event.id),
+      isOwner: true,
+    });
   } catch (error) {
     console.error("Erro no POST /events:", error);
     return res.status(500).json({ error: "Erro ao criar evento" });
