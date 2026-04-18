@@ -451,7 +451,7 @@ app.post("/events", auth, async (req, res) => {
           [cleanEmails]
         );
 
-        for (const user of usersResult.rows) {
+       for (const user of usersResult.rows) {
   if (user.id !== req.userId) {
 
     await pool.query(
@@ -473,7 +473,6 @@ app.post("/events", auth, async (req, res) => {
 
   }
 }
-
     return res.json({
       ...event,
       id: String(event.id),
