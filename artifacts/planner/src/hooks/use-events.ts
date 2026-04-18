@@ -33,7 +33,10 @@ export function useEvents() {
     });
 
     const data = await res.json();
-    if (res.ok) setEvents(data);
+
+    if (res.ok) {
+      setEvents(data);
+    }
   }, []);
 
   useEffect(() => {
@@ -41,27 +44,28 @@ export function useEvents() {
   }, [loadEvents]);
 
   const addEvent = async (event: any) => {
-  const token = getToken();
-  if (!token) return;
+    const token = getToken();
+    if (!token) return;
 
-  const res = await fetch(`${API_URL}/events`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token,
-    },
-    body: JSON.stringify(event),
-  });
+    const res = await fetch(`${API_URL}/events`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+      body: JSON.stringify(event),
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (res.ok) {
-    setEvents((prev) => [...prev, data]);
-  }
-};
+    if (res.ok) {
+      setEvents((prev) => [...prev, data]);
+    }
+  };
 
   const updateEvent = async (id: string, updates: any) => {
     const token = getToken();
+    if (!token) return;
 
     const res = await fetch(`${API_URL}/events/${id}`, {
       method: "PATCH",
@@ -75,24 +79,31 @@ export function useEvents() {
     const data = await res.json();
 
     if (res.ok) {
-      setEvents((prev) =>
-        prev.map((e) => (e.id === id ? data : e))
-      );
+      setEvents((prev) => prev.map((e) => (e.id === id ? data : e)));
     }
   };
 
   const deleteEvent = async (id: string) => {
     const token = getToken();
+    if (!token) return;
 
-    await fetch(`${API_URL}/events/${id}`, {
+    const res = await fetch(`${API_URL}/events/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: token,
       },
     });
 
-    setEvents((prev) => prev.filter((e) => e.id !== id));
+    if (res.ok) {
+      setEvents((prev) => prev.filter((e) => e.id !== id));
+    }
   };
 
-  return { events, addEvent, updateEvent, deleteEvent };
+  return {
+    events,
+    loadEvents,
+    addEvent,
+    updateEvent,
+    deleteEvent,
+  };
 }
