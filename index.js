@@ -452,19 +452,25 @@ app.post("/events", auth, async (req, res) => {
         );
 
         for (const user of usersResult.rows) {
-          if (user.id !== req.userId) {
-            await pool.query(
-              `
-              INSERT INTO event_participants (event_id, user_id)
-              VALUES ($1, $2)
-              ON CONFLICT (event_id, user_id) DO NOTHING
-              `,
-              [event.id, user.id]
-            );
-          }
-        }
-      }
-    }
+  if (user.id !== req.userId) {
+    await pool.query(
+      `
+      INSERT INTO event_participants (event_id, user_id)
+      VALUES ($1, $2)
+      ON CONFLICT (event_id, user_id) DO NOTHING
+      `,
+      [event.id, user.id]
+    );
+
+    await pool.query(
+      `
+      INSERT INTO notifications (user_id, message)
+      VALUES ($1, $2)
+      `,
+      [user.id, `Você foi convidado para o evento: ${event.title}`]
+    );
+  }
+}
 
     return res.json({
       ...event,
