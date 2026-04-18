@@ -42,12 +42,28 @@ export function useEvents() {
 
   const addEvent = async (event: any) => {
     const token = getToken();
+    if (!token) return;
 
     const res = await fetch(`${API_URL}/events`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: token,
+      },
+      body: JSON.stringify(event),
+    });
+
+    if (res.ok) {
+      loadEvents();
+    }
+  };
+
+  return {
+    events,
+    loadEvents,
+    addEvent,
+  };
+}
       },
       body: JSON.stringify(event),
     });
