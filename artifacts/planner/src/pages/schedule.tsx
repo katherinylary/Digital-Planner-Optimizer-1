@@ -536,7 +536,7 @@ export default function Schedule() {
 
       <div className="grid grid-cols-7 gap-1">
         {Array.from({ length: startDay }).map((_, i) => (
-          <div key={empty-${i}} />
+          <div key={`empty-${i}`} />
         ))}
 
         {monthDays.map((day) => {
