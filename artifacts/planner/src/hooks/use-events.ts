@@ -26,7 +26,7 @@ export function useEvents() {
     const token = getToken();
     if (!token) return;
 
-    const res = await fetch(${`API_URL}/events`, {
+    const res = await fetch(`${API_URL}/events`, {
       headers: {
         Authorization: token,
       },
