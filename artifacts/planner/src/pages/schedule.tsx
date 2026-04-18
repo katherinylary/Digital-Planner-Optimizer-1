@@ -576,3 +576,6 @@ export default function Schedule() {
     </CardContent>
   </Card>
 )}
+ </div>
+ );
+ }
