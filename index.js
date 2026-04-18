@@ -453,6 +453,7 @@ app.post("/events", auth, async (req, res) => {
 
         for (const user of usersResult.rows) {
   if (user.id !== req.userId) {
+
     await pool.query(
       `
       INSERT INTO event_participants (event_id, user_id)
@@ -469,6 +470,7 @@ app.post("/events", auth, async (req, res) => {
       `,
       [user.id, `Você foi convidado para o evento: ${event.title}`]
     );
+
   }
 }
 
