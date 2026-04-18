@@ -22,6 +22,16 @@ const pool = new Pool({
 
 async function initDB() {
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS notifications (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      message TEXT NOT NULL,
+      read BOOLEAN DEFAULT false,
+      created_at BIGINT DEFAULT (EXTRACT(EPOCH FROM NOW()) * 1000)
+    );
+  `);
+  
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       email TEXT UNIQUE NOT NULL,
