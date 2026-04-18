@@ -41,36 +41,24 @@ export function useEvents() {
   }, [loadEvents]);
 
   const addEvent = async (event: any) => {
-    const token = getToken();
-    if (!token) return;
+  const token = getToken();
+  if (!token) return;
 
-    const res = await fetch(`${API_URL}/events`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
-      },
-      body: JSON.stringify(event),
-    });
+  const res = await fetch(`${API_URL}/events`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token,
+    },
+    body: JSON.stringify(event),
+  });
 
-    if (res.ok) {
-      loadEvents();
-    }
-  };
+  const data = await res.json();
 
-  return {
-    events,
-    loadEvents,
-    addEvent,
-  };
-}
-      },
-      body: JSON.stringify(event),
-    });
-
-    const data = await res.json();
-    if (res.ok) setEvents((prev) => [...prev, data]);
-  };
+  if (res.ok) {
+    setEvents((prev) => [...prev, data]);
+  }
+};
 
   const updateEvent = async (id: string, updates: any) => {
     const token = getToken();
