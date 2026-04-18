@@ -577,5 +577,5 @@ export default function Schedule() {
   </Card>
 )}
  </div>
- );
- }
+);
+}
