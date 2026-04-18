@@ -498,78 +498,81 @@ export default function Schedule() {
 </Card>
 </div>
 ) : (
-<Card>
-  <CardHeader className="pb-2">
-    <div className="flex items-center justify-between">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-        data-testid="button-prev-month"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
+  <Card>
+    <CardHeader className="pb-2">
+      <div className="flex items-center justify-between">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+          data-testid="button-prev-month"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
 
-      <CardTitle className="text-lg capitalize">
-        {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
-      </CardTitle>
+        <CardTitle className="text-lg capitalize">
+          {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
+        </CardTitle>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-        data-testid="button-next-month"
-      >
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-    </div>
-  </CardHeader>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+          data-testid="button-next-month"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </CardHeader>
 
-  <CardContent>
-    <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground mb-2">
-      {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d) => (
-        <div key={d} className="py-1 font-medium">
-          {d}
-        </div>
-      ))}
-    </div>
+    <CardContent>
+      <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground mb-2">
+        {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d) => (
+          <div key={d} className="py-1 font-medium">
+            {d}
+          </div>
+        ))}
+      </div>
 
-   <div className="grid grid-cols-7 gap-1">
-  {Array.from({ length: startDay }).map((_, i) => (
-    <div key={empty-${i}} />
-  ))}
+      <div className="grid grid-cols-7 gap-1">
+        {Array.from({ length: startDay }).map((_, i) => (
+          <div key={empty-${i}} />
+        ))}
 
-  {monthDays.map((day) => {
-    const ds = format(day, "yyyy-MM-dd");
-    const count = events.filter((e) => e.date === ds).length;
-    const isToday = isSameDay(day, new Date());
-    const isSelected = isSameDay(day, selectedDate);
+        {monthDays.map((day) => {
+          const ds = format(day, "yyyy-MM-dd");
+          const count = events.filter((e) => e.date === ds).length;
+          const isToday = isSameDay(day, new Date());
+          const isSelected = isSameDay(day, selectedDate);
 
-    return (
-      <button
-        key={ds}
-        onClick={() => {
-          setSelectedDate(day);
-          setView("timeline");
-        }}
-        className={cn(
-          "aspect-square rounded-lg text-sm flex flex-col items-center justify-center gap-0.5 transition-colors",
-          isToday && "ring-2 ring-primary",
-          isSelected && "bg-primary text-primary-foreground",
-          !isSelected && "hover:bg-muted"
-        )}
-        data-testid={calendar-day-${ds}}
-      >
-        {format(day, "d")}
-        {count > 0 && (
-          <div
-            className={cn(
-              "w-1.5 h-1.5 rounded-full",
-              isSelected ? "bg-primary-foreground" : "bg-primary"
-            )}
-          />
-        )}
-      </button>
-    );
-  })}
-</div>
+          return (
+            <button
+              key={ds}
+              onClick={() => {
+                setSelectedDate(day);
+                setView("timeline");
+              }}
+              className={cn(
+                "aspect-square rounded-lg text-sm flex flex-col items-center justify-center gap-0.5 transition-colors",
+                isToday && "ring-2 ring-primary",
+                isSelected && "bg-primary text-primary-foreground",
+                !isSelected && "hover:bg-muted"
+              )}
+              data-testid={calendar-day-${ds}}
+            >
+              {format(day, "d")}
+              {count > 0 && (
+                <div
+                  className={cn(
+                    "w-1.5 h-1.5 rounded-full",
+                    isSelected ? "bg-primary-foreground" : "bg-primary"
+                  )}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </CardContent>
+  </Card>
+)}
