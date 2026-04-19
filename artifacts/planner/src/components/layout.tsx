@@ -112,12 +112,25 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </button>
           
           <div className="flex-1" />
-          
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-muted-foreground font-medium">
-              {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
-            </div>
-          </div>
+         <div className="flex items-center gap-4">
+  <div className="relative">
+    <Bell className="h-5 w-5 text-muted-foreground" />
+
+    {unreadCount > 0 && (
+      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center">
+        {unreadCount}
+      </span>
+    )}
+  </div>
+
+  <div className="text-sm text-muted-foreground font-medium">
+    {new Date().toLocaleDateString("pt-BR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    })}
+  </div>
+</div>
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
