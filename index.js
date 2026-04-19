@@ -475,7 +475,7 @@ app.post("/events", auth, async (req, res) => {
               INSERT INTO notifications (user_id, message)
               VALUES ($1, $2)
               `,
-              [user.id, Você foi convidado para o evento: ${event.title}]
+              [user.id, `Você foi convidado para o evento: ${event.title}`]
             );
           }
         }
@@ -623,7 +623,7 @@ const PORT = process.env.PORT || 3000;
 initDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(API rodando na porta ${PORT});
+      console.log(`API rodando na porta ${PORT}`);
     });
   })
   .catch((error) => {
