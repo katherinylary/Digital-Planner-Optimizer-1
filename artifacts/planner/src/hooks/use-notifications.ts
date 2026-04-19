@@ -39,19 +39,17 @@ export function useNotifications() {
   }, [loadNotifications]);
 
   const markAsRead = async (id: string) => {
-  const token = getToken();
-  if (!token) return;
+    const token = getToken();
+    if (!token) return;
 
-  await fetch(`${API_URL}/notifications/${id}/read`, {
-    method: "PATCH",
-    headers: {
-      Authorization: token,
-    },
-  });
+    await fetch(`${API_URL}/notifications/${id}/read`, {
+      method: "PATCH",
+      headers: {
+        Authorization: token,
+      },
+    });
 
-  loadNotifications();
-};
-    
+    loadNotifications();
   };
 
   return {
