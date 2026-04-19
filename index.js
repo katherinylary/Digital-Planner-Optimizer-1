@@ -398,6 +398,28 @@ app.get("/events", auth, async (req, res) => {
     return res.status(500).json({ error: "Erro ao buscar eventos" });
   }
 });
+app.get("/notifications", auth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        id::text AS id,
+        message,
+        read,
+        created_at AS "createdAt"
+      FROM notifications
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      `,
+      [req.userId]
+    );
+
+    return res.json(result.rows);
+  } catch (error) {
+    console.error("Erro no GET /notifications:", error);
+    return res.status(500).json({ error: "Erro ao buscar notificações" });
+  }
+});
 
 app.post("/events", auth, async (req, res) => {
   try {
