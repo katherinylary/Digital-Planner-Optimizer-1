@@ -576,7 +576,7 @@ app.patch("/events/:id", auth, async (req, res) => {
               VALUES ($1, $2)
               ON CONFLICT (event_id, user_id) DO NOTHING
               `,
-              [req.params.id, user.id]
+              [event.id, user.id]
             );
           }
         }
