@@ -47,7 +47,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   const auth = useAuth();
-  const { notifications, markAsRead } = useNotifications();
+  const { notifications, markAsRead, toast, clearToast } = useNotifications();
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
@@ -220,6 +220,28 @@ export function Layout({ children }: { children: React.ReactNode }) {
             {children}
           </div>
         </div>
+        {toast && (
+  <div className="fixed bottom-6 right-6 z-[60] animate-in fade-in slide-in-from-bottom-2 duration-300">
+    <div className="bg-card border border-border shadow-xl rounded-2xl px-4 py-3 min-w-[280px] max-w-[360px]">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5">🔔</div>
+          <div>
+            <p className="text-sm font-medium">Nova notificação</p>
+            <p className="text-sm text-muted-foreground mt-1">{toast}</p>
+          </div>
+        </div>
+
+        <button
+          onClick={clearToast}
+          className="text-xs text-muted-foreground hover:text-foreground"
+        >
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </main>
     </div>
   );
