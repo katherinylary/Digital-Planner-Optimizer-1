@@ -44,8 +44,10 @@ const navigation = [
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
   const auth = useAuth();
-  const { notifications } = useNotifications();
+  const { notifications, markAsRead } = useNotifications();
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
@@ -142,12 +144,64 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
           <div className="flex items-center gap-4">
             <div className="relative">
-              <Bell className="h-5 w-5 text-muted-foreground" />
+              <button
+                onClick={() => setIsNotificationsOpen((prev) => !prev)}
+                className="relative p-1 rounded-md hover:bg-muted transition-colors"
+              >
+                <Bell className="h-5 w-5 text-muted-foreground" />
 
-              {unreadCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center">
-                  {unreadCount}
-                </span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {isNotificationsOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-card border border-border rounded-xl shadow-lg z-50 p-3 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">Notificações</p>
+
+                    <button
+                      onClick={() => setIsNotificationsOpen(false)}
+                      className="text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      Fechar
+                    </button>
+                  </div>
+
+                  {notifications.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Nenhuma notificação.
+                    </p>
+                  ) : (
+                    notifications.slice(0, 5).map((n) => (
+                      <div
+                        key={n.id}
+                        className="p-3 rounded-lg border border-border flex items-start justify-between gap-3"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-sm">{n.message}</p>
+
+                          {!n.read && (
+                            <p className="text-xs text-primary font-medium mt-1">
+                              Nova
+                            </p>
+                          )}
+                        </div>
+
+                        {!n.read && (
+                          <button
+                            onClick={() => markAsRead(n.id)}
+                            className="text-xs px-2 py-1 rounded-md border border-border hover:bg-muted shrink-0"
+                          >
+                            Lida
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
               )}
             </div>
 
