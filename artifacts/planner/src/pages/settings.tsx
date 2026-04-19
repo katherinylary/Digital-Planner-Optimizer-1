@@ -259,13 +259,15 @@ export default function Settings() {
           </div>
 
           {!n.read && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => markAsRead(n.id)}
-            >
-              Marcar como lida
-            </Button>
+           <Button
+  variant="outline"
+  size="sm"
+  onClick={async () => {
+    await markAsRead(n.id);
+  }}
+>
+  Marcar como lida
+</Button>
           )}
         </div>
       ))
