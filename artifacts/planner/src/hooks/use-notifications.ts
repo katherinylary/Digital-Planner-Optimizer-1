@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const API_URL = "https://digital-planner-optimizer-1-4.onrender.com";
 const TOKEN_KEY = "planner_auth_token";
@@ -16,40 +16,66 @@ function getToken() {
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const previousCountRef = useRef(0);
 
   const loadNotifications = useCallback(async () => {
-    const token = getToken();
-    if (!token) return;
+    try {
+      const token = getToken();
+      if (!token) return;
 
-    const res = await fetch(`${API_URL}/notifications`, {
-      headers: {
-        Authorization: token,
-      },
-    });
+      const res = await fetch(`${API_URL}/notifications`, {
+        headers: {
+          Authorization: token,
+        },
+      });
 
-    const data = await res.json();
+      if (!res.ok) return;
 
-    if (res.ok) {
+      const data: NotificationItem[] = await res.json();
+
+      if (
+        previousCountRef.current > 0 &&
+        data.length > previousCountRef.current
+      ) {
+        const newest = data[0];
+        if (newest && !newest.read) {
+          alert(`Nova notificação: ${newest.message}`);
+        }
+      }
+
+      previousCountRef.current = data.length;
       setNotifications(data);
+    } catch (error) {
+      console.error("Erro ao carregar notificações:", error);
     }
   }, []);
 
   useEffect(() => {
     loadNotifications();
+
+    const interval = setInterval(() => {
+      loadNotifications();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, [loadNotifications]);
 
   const markAsRead = async (id: string) => {
-    const token = getToken();
-    if (!token) return;
+    try {
+      const token = getToken();
+      if (!token) return;
 
-    await fetch(`${API_URL}/notifications/${id}/read`, {
-      method: "PATCH",
-      headers: {
-        Authorization: token,
-      },
-    });
+      await fetch(`${API_URL}/notifications/${id}/read`, {
+        method: "PATCH",
+        headers: {
+          Authorization: token,
+        },
+      });
 
-    loadNotifications();
+      loadNotifications();
+    } catch (error) {
+      console.error("Erro ao marcar como lida:", error);
+    }
   };
 
   return {
