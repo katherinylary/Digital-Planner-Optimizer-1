@@ -555,45 +555,44 @@ app.patch("/events/:id", auth, async (req, res) => {
       ]
     );
 
-    if (participantEmails) {
-      await pool.query(
-        DELETE FROM event_participants WHERE event_id = $1,
-        [req.params.id]
-      );
+   if (participantEmails) {
+  await pool.query(
+    DELETE FROM event_participants WHERE event_id = $1,
+    [req.params.id]
+  );
 
-      const cleanEmails = [
-        ...new Set(
-          participantEmails
-            .map((email) => String(email).trim().toLowerCase())
-            .filter(Boolean)
-        ),
-      ];
+  const cleanEmails = [
+    ...new Set(
+      participantEmails
+        .map((email) => String(email).trim().toLowerCase())
+        .filter(Boolean)
+    ),
+  ];
 
-      if (cleanEmails.length > 0) {
-        const usersResult = await pool.query(
+  if (cleanEmails.length > 0) {
+    const usersResult = await pool.query(
+      `
+      SELECT id, email
+      FROM users
+      WHERE LOWER(email) = ANY($1)
+      `,
+      [cleanEmails]
+    );
+
+    for (const user of usersResult.rows) {
+      if (user.id !== req.userId) {
+        await pool.query(
           `
-          SELECT id, email
-          FROM users
-          WHERE LOWER(email) = ANY($1)
+          INSERT INTO event_participants (event_id, user_id)
+          VALUES ($1, $2)
+          ON CONFLICT (event_id, user_id) DO NOTHING
           `,
-          [cleanEmails]
+          [req.params.id, user.id]
         );
-
-        for (const user of usersResult.rows) {
-          if (user.id !== req.userId) {
-            await pool.query(
-              `
-              INSERT INTO event_participants (event_id, user_id)
-              VALUES ($1, $2)
-              ON CONFLICT (event_id, user_id) DO NOTHING
-              `,
-              [req.params.id, user.id]
-            );
-          }
-        }
       }
     }
-
+  }
+}
     return res.json({
       ...result.rows[0],
       isOwner: true,
