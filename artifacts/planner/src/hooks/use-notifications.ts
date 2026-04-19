@@ -16,7 +16,10 @@ function getToken() {
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const previousCountRef = useRef(0);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const previousUnreadIdsRef = useRef<string[]>([]);
+  const toastTimeoutRef = useRef<number | null>(null);
 
   const loadNotifications = useCallback(async () => {
     try {
@@ -32,19 +35,28 @@ export function useNotifications() {
       if (!res.ok) return;
 
       const data: NotificationItem[] = await res.json();
+      setNotifications(data);
 
-      if (
-        previousCountRef.current > 0 &&
-        data.length > previousCountRef.current
-      ) {
-        const newest = data[0];
-        if (newest && !newest.read) {
-          alert(`Nova notificação: ${newest.message}`);
+      const unread = data.filter((n) => !n.read);
+      const unreadIds = unread.map((n) => n.id);
+
+      const newestUnread = unread.find(
+        (n) => !previousUnreadIdsRef.current.includes(n.id)
+      );
+
+      if (newestUnread) {
+        setToast(newestUnread.message);
+
+        if (toastTimeoutRef.current) {
+          window.clearTimeout(toastTimeoutRef.current);
         }
+
+        toastTimeoutRef.current = window.setTimeout(() => {
+          setToast(null);
+        }, 4000);
       }
 
-      previousCountRef.current = data.length;
-      setNotifications(data);
+      previousUnreadIdsRef.current = unreadIds;
     } catch (error) {
       console.error("Erro ao carregar notificações:", error);
     }
@@ -53,11 +65,17 @@ export function useNotifications() {
   useEffect(() => {
     loadNotifications();
 
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       loadNotifications();
     }, 10000);
 
-    return () => clearInterval(interval);
+    return () => {
+      window.clearInterval(interval);
+
+      if (toastTimeoutRef.current) {
+        window.clearTimeout(toastTimeoutRef.current);
+      }
+    };
   }, [loadNotifications]);
 
   const markAsRead = async (id: string) => {
@@ -82,5 +100,7 @@ export function useNotifications() {
     notifications,
     loadNotifications,
     markAsRead,
+    toast,
+    clearToast: () => setToast(null),
   };
 }
