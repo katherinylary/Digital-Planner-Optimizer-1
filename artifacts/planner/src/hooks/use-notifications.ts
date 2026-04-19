@@ -39,21 +39,19 @@ export function useNotifications() {
   }, [loadNotifications]);
 
   const markAsRead = async (id: string) => {
-    const token = getToken();
-    if (!token) return;
+  const token = getToken();
+  if (!token) return;
 
-    const res = await fetch(`${API_URL}/notifications/${id}/read`, {
-      method: "PATCH",
-      headers: {
-        Authorization: token,
-      },
-    });
+  await fetch(`${API_URL}/notifications/${id}/read`, {
+    method: "PATCH",
+    headers: {
+      Authorization: token,
+    },
+  });
 
-    if (res.ok) {
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-      );
-    }
+  loadNotifications();
+};
+    
   };
 
   return {
