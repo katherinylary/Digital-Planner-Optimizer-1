@@ -30,7 +30,7 @@ async function initDB() {
       created_at BIGINT DEFAULT (EXTRACT(EPOCH FROM NOW()) * 1000)
     );
   `);
-  
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
@@ -273,7 +273,15 @@ app.post("/tasks", auth, async (req, res) => {
 
 app.patch("/tasks/:id", auth, async (req, res) => {
   try {
-    const { title, description, date, time, priority, category, completed } = req.body;
+    const {
+      title,
+      description,
+      date,
+      time,
+      priority,
+      category,
+      completed,
+    } = req.body;
 
     const current = await pool.query(
       `
@@ -499,7 +507,9 @@ app.patch("/events/:id", auth, async (req, res) => {
     const event = current.rows[0];
 
     if (!event) {
-      return res.status(404).json({ error: "Evento não encontrado ou você não pode editar este evento" });
+      return res
+        .status(404)
+        .json({ error: "Evento não encontrado ou você não pode editar este evento" });
     }
 
     const nextTitle = req.body.title ?? event.title;
@@ -547,7 +557,7 @@ app.patch("/events/:id", auth, async (req, res) => {
 
     if (participantEmails) {
       await pool.query(
-        `DELETE FROM event_participants WHERE event_id = $1`,
+        DELETE FROM event_participants WHERE event_id = $1,
         [req.params.id]
       );
 
@@ -577,7 +587,7 @@ app.patch("/events/:id", auth, async (req, res) => {
               VALUES ($1, $2)
               ON CONFLICT (event_id, user_id) DO NOTHING
               `,
-              [event.id, user.id]
+              [req.params.id, user.id]
             );
           }
         }
@@ -613,7 +623,7 @@ const PORT = process.env.PORT || 3000;
 initDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`API rodando na porta ${PORT}`);
+      console.log(API rodando na porta ${PORT});
     });
   })
   .catch((error) => {
