@@ -1,3 +1,4 @@
+import { useNotifications } from "@/hooks/use-notifications";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { useTheme } from "@/hooks/use-theme";
 export default function Settings() {
   const [confirmClear, setConfirmClear] = useState(false);
   const auth = useAuth();
+  const { notifications, markAsRead } = useNotifications();
   const { theme, setTheme } = useTheme();
 
   const handleExport = () => {
@@ -235,6 +237,41 @@ export default function Settings() {
           </Dialog>
         </CardContent>
       </Card>
+      
+      <Card>
+  <CardHeader>
+    <CardTitle className="text-lg font-serif italic">Notificações</CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-3">
+    {notifications.length === 0 ? (
+      <p className="text-sm text-muted-foreground">Nenhuma notificação no momento.</p>
+    ) : (
+      notifications.map((n) => (
+        <div
+          key={n.id}
+          className="p-3 rounded-lg border border-border flex items-start justify-between gap-3"
+        >
+          <div>
+            <p className="text-sm">{n.message}</p>
+            {!n.read && (
+              <p className="text-xs text-primary font-medium mt-1">Nova</p>
+            )}
+          </div>
+
+          {!n.read && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => markAsRead(n.id)}
+            >
+              Marcar como lida
+            </Button>
+          )}
+        </div>
+      ))
+    )}
+  </CardContent>
+</Card>
 
       {/* Sobre */}
       <Card>
