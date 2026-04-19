@@ -420,6 +420,23 @@ app.get("/notifications", auth, async (req, res) => {
     return res.status(500).json({ error: "Erro ao buscar notificações" });
   }
 });
+app.patch("/notifications/:id/read", auth, async (req, res) => {
+  try {
+    await pool.query(
+      `
+      UPDATE notifications
+      SET read = true
+      WHERE id = $1 AND user_id = $2
+      `,
+      [req.params.id, req.userId]
+    );
+
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error("Erro no PATCH /notifications/:id/read:", error);
+    return res.status(500).json({ error: "Erro ao atualizar notificação" });
+  }
+});
 
 app.post("/events", auth, async (req, res) => {
   try {
