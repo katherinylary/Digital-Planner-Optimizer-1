@@ -58,12 +58,152 @@ export default function Professional() {
       </h1>
 
       <Tabs defaultValue="activities">
-        <TabsList className="w-full grid grid-cols-4">
-          <TabsTrigger value="activities">Atividades</TabsTrigger>
-          <TabsTrigger value="report">Relatório</TabsTrigger>
-          <TabsTrigger value="calendar">Calendário</TabsTrigger>
-          <TabsTrigger value="reminders">Lembretes</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="dashboard">
+  <TabsList className="w-full grid grid-cols-5">
+    <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+    <TabsTrigger value="cashflow">Fluxo de Caixa</TabsTrigger>
+    <TabsTrigger value="budget">Orçamentos</TabsTrigger>
+    <TabsTrigger value="purchases">Compras</TabsTrigger>
+    <TabsTrigger value="report">Relatórios</TabsTrigger>
+  </TabsList>
+          <TabsContent value="dashboard" className="mt-4">
+  <div className="grid gap-4 md:grid-cols-4">
+
+    <Card>
+      <CardHeader>
+        <CardTitle>Saldo Atual</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-2xl font-bold text-green-600">
+          R$ 125.000
+        </p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <CardTitle>Receitas</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-2xl font-bold text-blue-600">
+          R$ 280.000
+        </p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <CardTitle>Despesas</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-2xl font-bold text-red-600">
+          R$ 155.000
+        </p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <CardTitle>Orçamentos</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-2xl font-bold text-primary">
+          18
+        </p>
+      </CardContent>
+    </Card>
+
+  </div>
+</TabsContent>
+          <TabsContent value="cashflow" className="mt-4">
+  <Card>
+    <CardHeader>
+      <CardTitle>Fluxo de Caixa</CardTitle>
+    </CardHeader>
+
+    <CardContent className="space-y-3">
+
+      <div className="flex justify-between border-b pb-2">
+        <span>Pagamento Cliente A</span>
+        <span className="text-green-600 font-semibold">
+          + R$ 35.000
+        </span>
+      </div>
+
+      <div className="flex justify-between border-b pb-2">
+        <span>Compra de Materiais</span>
+        <span className="text-red-600 font-semibold">
+          - R$ 12.500
+        </span>
+      </div>
+
+      <div className="flex justify-between border-b pb-2">
+        <span>Folha de Pagamento</span>
+        <span className="text-red-600 font-semibold">
+          - R$ 28.000
+        </span>
+      </div>
+
+    </CardContent>
+  </Card>
+</TabsContent>
+          <TabsContent value="budget" className="mt-4">
+  <Card>
+    <CardHeader>
+      <CardTitle>Controle de Orçamentos</CardTitle>
+    </CardHeader>
+
+    <CardContent className="space-y-3">
+
+      <div className="p-3 border rounded-lg">
+        <p className="font-medium">
+          Instalação Elétrica - Condomínio Alpha
+        </p>
+
+        <p className="text-sm text-muted-foreground">
+          Valor: R$ 87.000
+        </p>
+      </div>
+
+      <div className="p-3 border rounded-lg">
+        <p className="font-medium">
+          Subestação Industrial
+        </p>
+
+        <p className="text-sm text-muted-foreground">
+          Valor: R$ 145.000
+        </p>
+      </div>
+
+    </CardContent>
+  </Card>
+</TabsContent>
+          <TabsContent value="purchases" className="mt-4">
+  <Card>
+    <CardHeader>
+      <CardTitle>Controle de Compras</CardTitle>
+    </CardHeader>
+
+    <CardContent className="space-y-3">
+
+      <div className="flex justify-between border-b pb-2">
+        <span>Cabo 35mm²</span>
+        <span>R$ 7.200</span>
+      </div>
+
+      <div className="flex justify-between border-b pb-2">
+        <span>Disjuntores</span>
+        <span>R$ 3.800</span>
+      </div>
+
+      <div className="flex justify-between border-b pb-2">
+        <span>Eletrocalhas</span>
+        <span>R$ 2.950</span>
+      </div>
+
+    </CardContent>
+  </Card>
+</TabsContent>
 
         <TabsContent value="activities" className="space-y-4 mt-4">
           <div className="flex gap-2 justify-end">
